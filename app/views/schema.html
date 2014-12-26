@@ -1,0 +1,120 @@
+
+<div class="panel panel-default">
+
+<div class="navbar navbar-default">
+    <div class="navbar-header pull-left">
+      <span class="navbar-brand" ng-click="show=!show"><a>{{data.id.replace('#','')}}</a></span>
+    </div>
+    <div class="navbar-header pull-right">
+      <button type="button" class="btn btn-xs btn-default navbar-btn">Remove</button>
+    </div>
+</div>
+
+  <!--div class="panel-heading" ng-click="show=!show">
+    <span class="pull-left">{{data.id}}</span>
+    <button type="button" class="btn btn-default btn-xs pull-right">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>     </button>
+  </div-->
+
+
+<div class="panel-body">
+
+  <form class="form-inline" role="form">
+  <div class="form-group-sm" ng-show=show>
+    <div class="row">
+      <div class="col-xs-7">
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">ID</div>
+          <input type="text" ng-model="data.id" class="form-control input-sm">
+        </div>
+      </div>
+
+      <div class="col-xs-3">
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">Type</div>
+          <select class="form-control" ng-model="data.type">
+            <option>string</option>
+            <option>number</option>
+            <option>integer</option>
+            <option>boolean</option>
+            <option>object</option>
+            <option>array</option>
+            <option>null</option>
+            <option>any</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-xs-2">
+        <div class="checkbox">
+          <input type="checkbox" ng-model="data.required" />
+        </div>
+          <label class="control-label">Required</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-5">
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">Name</div>
+          <input type="text" ng-model="data.name" class="form-control input-sm col-xs-3">
+        </div>
+      </div>
+
+      <div class="col-xs-7">
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">Title</div>
+          <input type="text" ng-model="data.title" class="form-control input-sm col-xs-6">
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-8">
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">Description</div>
+          <input type="text" ng-model="data.description" class="form-control input-sm">
+        </div>
+      </div>
+      <span ng-if="data.default">
+        <div class="col-xs-4">
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon">Default</div>
+            <input type="text" ng-model="data.default" class="form-control input-sm">
+          </div>
+        </div>
+      </span>
+      <span ng-if="!data.default">
+        <div class="col-xs-4">
+          <div class="input-group input-group-sm ">
+            <div class="input-group-addon">Default</div>
+            <input type="text" ng-model="data.default" value="Non-primitive data type" disabled  class="form-control input-sm">
+          </div>
+        </div>
+      </span>
+    </div>
+  </div>
+</form>
+
+
+<span ng-if="data.properties">
+    <span class="label label-info">PROPERTIES</span>
+    <span ng-repeat="property in data.properties">
+        <schema data="property"></schema>
+    </span>
+</span>
+
+<span ng-if="data.items.length>0">
+    <span class="label label-warning">ITEMS</span>
+    <span ng-repeat="item in data.items">
+        <schema data="item"></schema>
+    </span>
+</span>
+
+<span ng-if="data.items && !(data.items.length>0)">
+    <span class="label label-warning">ITEMS</span>
+    <schema data="data.items"></schema>
+</span>
+
+</div>
+</div>

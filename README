@@ -1,0 +1,14 @@
+Installing
+==========
+
+> git clone https://jackwootton@code.google.com/p/json-schema/
+> npm install -g grunt-cli
+> bower install
+> npm install
+
+(npm is used for installing Node.js modules but Bower.js is used for managing front end components like html,css,js etc.)
+
+Running
+=======
+> cd json-schema
+> grunt server
