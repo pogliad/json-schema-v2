@@ -133,7 +133,7 @@ angular.module('jsonschemaV4App')
             	dst.type = src.type;
             };
 
-            this.addRequired = function(src, dst, subSchema) {
+            this.addRequired = function(src, dst, subSchema, dstSub) {
 
                 if (!dst.required) {
                     dst.required = []
@@ -141,6 +141,7 @@ angular.module('jsonschemaV4App')
 
                 if (user_defined_options.forceRequired) {
                     dst.required.push(subSchema.key);
+                    dstSub._required = true;
                 }
             };
 
@@ -171,7 +172,9 @@ angular.module('jsonschemaV4App')
 
                     var subSchema = self.constructSchema(value);
 
-                    self.addRequired(s, schema, value);
+                    // Because the outer loop iterates over sub-schemas
+                    // we make each a required property in it's parent.
+                    self.addRequired(s, schema, value, subSchema);
 
                     if (s.isObject()) {
                         schema.properties[value.key] = subSchema;
@@ -183,7 +186,6 @@ angular.module('jsonschemaV4App')
                             schema.items = {};
                         } else if (user_defined_options.arrayOptions ==
                                                 ArrayOptions.singleSchema) {
-                            console.log('single: ' + subSchema);
                             schema.items = subSchema;
                         } else {
                             // 	Use array of schemas, however, still may only be one.

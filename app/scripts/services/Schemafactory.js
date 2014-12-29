@@ -22,6 +22,7 @@ angular.module('jsonschemaV4App')
                 this.name = '';
                 this.defaultValue = undefined;
                 this.enums = undefined;
+                this._required = false;
 
                 if (user_defined_options.includeDefaults && isPrimitiveType) {
                     this.defaultValue = aValue;
