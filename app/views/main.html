@@ -103,10 +103,14 @@
             <br />
             <br />
             <div ng:show="selected == 1">
-                <schema class="rootSchema" data="data"></schema>
+                <div ng-controller="EditController">
+                    <schema class="rootSchema" data="data"></schema>
+                </div>
             </div>
             <div ng:show="selected == 2">
-                <pre>{{datastr}}</pre>
+                <div ng-controller="CodeController">
+                    <pre>{{datastr}}</pre>
+                </div>
             </div>
             </div>
         </div>

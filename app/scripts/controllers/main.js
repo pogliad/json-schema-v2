@@ -10,36 +10,41 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                 var compiledContents;
 
                 // postLink function.
-                return function(scope, iElement, iAttrs, controller, transcludeFn) {
-                    if (!compiledContents) {
-                        /*
-                        Note: The compile function cannot handle directives that
-                        recursively use themselves in their own templates or
-                        compile functions. Compiling these directives results in
-                        an infinite loop and a stack overflow errors. This can be
-                        avoided by manually using $compile in the postLink function
-                        to imperatively compile a directive's template instead of
-                        relying on automatic template compilation via template or
-                        templateUrl declaration or manual compilation inside the
-                        compile function.
-                        */
-                        compiledContents = $compile(contents);
-                        /*
-                        $compile() compiles an HTML string or DOM into a template
-                        and produces a template function, which can then be used
-                        to link scope and the template together.
-                        */
-                    }
+                return {
+                    post: function(scope, iElement, iAttrs) {
+                        if (!compiledContents) {
+                            /*
+                            Note: The compile function cannot handle directives that
+                            recursively use themselves in their own templates or
+                            compile functions. Compiling these directives results in
+                            an infinite loop and a stack overflow errors. This can be
+                            avoided by manually using $compile in the postLink function
+                            to imperatively compile a directive's template instead of
+                            relying on automatic template compilation via template or
+                            templateUrl declaration or manual compilation inside the
+                            compile function.
+                            */
+                            compiledContents = $compile(contents);
+                            /*
+                            $compile() compiles an HTML string or DOM into a template
+                            and produces a template function, which can then be used
+                            to link scope and the template together.
+                            */
+                        }
 
-                    // Link scope and the template together.
-                    compiledContents(scope, function(clone) {
-                        console.log(iElement);
-                        iElement.append(clone);
-                    });
-                };
+                        // Link scope and the template together.
+                        compiledContents(scope, function(clone) {
+                            iElement.append(clone);
+                        });
+
+                        scope.deleteMe = function(node) {
+                            console.log(node);
+                        };
+                    },
+                    pre: function(scope, iElement, iAttrs) { }
+                }
             }
-        };
-
+        }
         return RecursionHelper;
     }
 ]);
@@ -48,23 +53,19 @@ angular.module('jsonschemaV4App').directive("schema", function(RecursionHelper) 
     return {
         restrict: "E",
         scope: {
-            data: '=',
-            onRemove: '&',      // Pass a reference to the method
+            data: '=data'
         },
         templateUrl: 'views/schema.html',
         compile: function(tElement, tAttributes) {
             return RecursionHelper.compile(tElement, tAttributes);
-        },
-        link: function(scope, iElement, iAttrs) {
-            console.log('link');
         }
     };
 });
 
 angular.module('jsonschemaV4App')
-    .controller('InputController', ['$scope', '$log',
+    .controller('InputController', ['$scope', '$log', '$rootScope',
         'Schemaservice',
-        function($scope, $log, Schemaservice) {
+        function($scope, $log, $rootScope, Schemaservice) {
 
             $scope.schemarize = function() {
 
@@ -100,11 +101,32 @@ angular.module('jsonschemaV4App')
             var init = function() {
                 $scope.reset();
                 $scope.schemarize();
-                Schemaservice.dirty++;
             };
 
             // Loads UI defaults and generates schema.
             init();
+        }
+    ]);
+
+angular.module('jsonschemaV4App')
+    .controller('EditController', ['$scope', '$log', '$rootScope',
+        'Schemaservice',
+        function($scope, $log, $rootScope, Schemaservice) {
+
+            $scope.data = Schemaservice.getSchema();
+
+            $scope.deleteMe = function(node) {
+                console.log(1);
+            };
+        }
+    ]);
+
+angular.module('jsonschemaV4App')
+    .controller('CodeController', ['$scope', '$log',
+        'Schemaservice',
+        function($scope, $log, Schemaservice) {
+            $scope.datastr = Schemaservice.getSchemaAsString(
+                                user_defined_options.prettyPrint);
         }
     ]);
 
@@ -120,8 +142,6 @@ angular.module('jsonschemaV4App')
             };
 
             $scope.setEditView = function() {
-                $scope.data = Schemaservice.getSchema();
-
                 // Change view.
                 $scope.selected = 1;
                 // Update button style.
@@ -130,10 +150,6 @@ angular.module('jsonschemaV4App')
             };
 
             $scope.setCodeView = function() {
-
-                // User may have made changes in Edit view.
-                $scope.datastr = Schemaservice.getSchemaAsString(
-                                user_defined_options.prettyPrint);
                 // Change view.
                 $scope.selected = 2;
                 // Update button style.
@@ -141,16 +157,11 @@ angular.module('jsonschemaV4App')
                 $scope.codeview = "primary active";
             };
 
-            $scope.$watch(function() {
-                return Schemaservice.dirty;
-            }, function(newVal) {
-                // Code view.
-                /*$scope.data = Schemaservice.getSchema();
-                // Edit view.
-                $scope.datastr = Schemaservice.getSchemaAsString(
-                                user_defined_options.prettyPrint);*/
-
+            var init = function() {
                 $scope.setCodeView();
-            });
+            };
+
+            // Loads UI defaults and generates schema.
+            init();
         }
     ]);
