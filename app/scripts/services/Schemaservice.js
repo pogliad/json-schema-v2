@@ -2,9 +2,8 @@
 
 angular.module('jsonschemaV4App')
     .service('Schemaservice', ['$log', 'Schemafactory',
-        'user_defined_options', 'ArrayOptions','Specification',
+        'ArrayOptions','Specification',
         function Schemaservice($log, Schemafactory,
-            user_defined_options,
             ArrayOptions,Specification) {
             // AngularJS will instantiate a singleton by calling "new"
             // on this function.
@@ -13,6 +12,7 @@ angular.module('jsonschemaV4App')
             this.json = {};
             this.intermediateResult = {};
             this.schema = {};
+            this.dirty = 0;
 
             this.constructBasicSchema = function() {
 
@@ -44,7 +44,7 @@ angular.module('jsonschemaV4App')
                         // number, integer, string, null, boolean
                         subSchema = Schemafactory.getInstance(key, value);
                     }
-                    subSchema.parent = schema;
+                    //subSchema.parent = schema;
                     schema.addSubSchema(subSchema);
                 })
                 return schema;
@@ -71,13 +71,13 @@ angular.module('jsonschemaV4App')
                 }
             };
 
-            this.addProperties = function(src, dst) {
+            this.initProperties = function(src, dst) {
                 if (src.isObject()) {
                     dst.properties = {};
                 }
             };
 
-            this.addItems = function(src, dst) {
+            this.initItems = function(src, dst) {
                 if (src.isArray()) {
                     if (src.subSchemas.length > 1) {
                     	// The user may have selected Single Schema
@@ -141,7 +141,6 @@ angular.module('jsonschemaV4App')
 
                 if (user_defined_options.forceRequired) {
                     dst.required.push(subSchema.key);
-                    dstSub._required = true;
                 }
             };
 
@@ -149,37 +148,42 @@ angular.module('jsonschemaV4App')
                 dst.additionalProperties = false;
             }
 
-            this.constructSchema = function(s) {
+            this.constructSchema = function(intermediate_schema) {
                 var schema = {};
 
-                if (s.root) {
+                if (intermediate_schema.root) {
+                    // Explicitly declare this JSON as JSON schema.
                     schema._$schema = Specification;
                 }
 
-                self.constructId(s, schema);
-                self.setType(s, schema);
-                self.makeVerbose(s, schema);
-                self.addDefault(s, schema);
-                self.addEnums(s, schema);
-                self.setDefaultProperties(s, schema);
+                self.constructId(intermediate_schema, schema);
+                self.setType(intermediate_schema, schema);
+                self.makeVerbose(intermediate_schema, schema);
+                self.addDefault(intermediate_schema, schema);
+                self.addEnums(intermediate_schema, schema);
+                self.setDefaultProperties(intermediate_schema, schema);
 
                 // Subschemas last.
-                self.addProperties(s, schema);
-                self.addItems(s, schema);
+                // Don't actually add any properties or items, just initialize
+                // the object properties so properties and items may be added.
+                self.initProperties(intermediate_schema, schema);
+                self.initItems(intermediate_schema, schema);
 
-                // Refine subschemas
-                angular.forEach(s.subSchemas, function(value, key) {
+                // Schemas with no sub-schemas will just skip this loop and
+                // return the { } object.
+                angular.forEach(intermediate_schema.subSchemas, function(value, key) {
 
+                    // Each sub-schema will need its own {} schema object.
                     var subSchema = self.constructSchema(value);
 
                     // Because the outer loop iterates over sub-schemas
                     // we make each a required property in it's parent.
-                    self.addRequired(s, schema, value, subSchema);
+                    self.addRequired(intermediate_schema, schema, value, subSchema);
 
-                    if (s.isObject()) {
+                    if (intermediate_schema.isObject()) {
                         schema.properties[value.key] = subSchema;
 
-                    } else if (s.isArray()) {
+                    } else if (intermediate_schema.isArray()) {
 
                         if (user_defined_options.arrayOptions ==
                                                 ArrayOptions.emptySchema) {
@@ -189,7 +193,7 @@ angular.module('jsonschemaV4App')
                             schema.items = subSchema;
                         } else {
                             // 	Use array of schemas, however, still may only be one.
-                            if (s.subSchemas.length > 1) {
+                            if (intermediate_schema.subSchemas.length > 1) {
                                 schema.items.push(subSchema);
                             } else {
                                 schema.items = subSchema;
@@ -202,29 +206,21 @@ angular.module('jsonschemaV4App')
             };
 
             this.removeSchema = function(schema) {
-
-                console.log(schema['id']);
-
-                $.each(self.schema, function(key, val) {
-                    console.log(key);
-                    if (key == 'id') {
-                        if (val == schema['id']) {
-                            console.log(key + '=' + val);
-                        } else {
-                            self.removeSchema(val);
-                        }
-                    }
-
-                });
+                console.log(schema['id']);  
             };
 
             this.getSchema = function() {
                 return self.schema;
             };
 
+            this.setSchema = function(schema) {
+                self.schema = schema;
+            };
+
             this.getSchemaAsString = function(pretty_print) {
                 var str = angular.toJson(self.schema, pretty_print);
-                return str.replace('_$','$');
+                str = str.replace('_$','$');
+                return str;
             }
         }
     ]);

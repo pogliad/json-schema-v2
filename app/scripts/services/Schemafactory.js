@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('jsonschemaV4App')
-    .factory('Schemafactory', ['$log', 'user_defined_options', 'Utility',
-        function($log, user_defined_options, Utility) {
+    .factory('Schemafactory', ['$log', 'Utility',
+        function($log, Utility) {
 
             var Schema = function(aKey, aValue) {
 
@@ -10,19 +10,15 @@ angular.module('jsonschemaV4App')
                     (!angular.isArray(aValue)) && (!angular.isObject(aValue))
                 );
 
-                // Only root has no key.
-                var isRoot = !angular.isDefined(aKey);
-
-                this.root = isRoot;
-                this.id = isRoot ? user_defined_options.url : ('#' + aKey);
-                this.key = isRoot ? '/' : aKey.toString();
+                // Root object's key is undefined.
+                this.root = !angular.isDefined(aKey);
+                // These values are copied from 'src' to 'dst' in Schemaservice.
+                this.id = this.root ? user_defined_options.url : ('#' + aKey);
+                this.key = this.root ? '/' : aKey.toString();
                 this.type = Utility.getType(aValue);
-                this.title = isRoot ? 'root' : '';
+                this.title = this.root ? 'root' : '';
                 this.description = '';
                 this.name = '';
-                this.defaultValue = undefined;
-                this.enums = undefined;
-                this._required = false;
 
                 if (user_defined_options.includeDefaults && isPrimitiveType) {
                     this.defaultValue = aValue;
@@ -33,6 +29,8 @@ angular.module('jsonschemaV4App')
 
             Schema.prototype.addSubSchema = function(aSchema) {
                 this.subSchemas.push(aSchema);
+                // Allow sub-schemas to reference parent schemas.
+                aSchema.parent = this;
             };
 
             Schema.prototype.isObject = function(aSchema) {

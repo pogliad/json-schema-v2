@@ -56,6 +56,7 @@ var default_options = {
 var user_defined_options = angular.copy(default_options);
 
 app.value('user_defined_options', user_defined_options);
+app.value('default_options', default_options);
 
 app.config(function($routeProvider) {
     $routeProvider
