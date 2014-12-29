@@ -50,7 +50,8 @@ angular.module('jsonschemaV4App')
             $scope.schemarize = function() {
 
                 // Update app options in case the user defined new values.
-                user_defined_options.url = $scope.inputUrl;
+                user_defined_options.url = $scope.url;
+                user_defined_options.json = $scope.json;
                 user_defined_options.includeDefaults = $scope.includeDefaults;
                 user_defined_options.includeEnums = $scope.includeEnums;
                 user_defined_options.forceRequired = $scope.forceRequired;
@@ -61,12 +62,12 @@ angular.module('jsonschemaV4App')
                 user_defined_options.prettyPrint = $scope.prettyPrint;
 
                 // Generate basic schema structure.
-                Schemaservice.constructBasicSchema($scope.inputJson);
+                Schemaservice.constructBasicSchema();
             };
 
             $scope.reset = function() {
-                $scope.inputJson = angular.toJson(default_options.json, true);
-                $scope.inputUrl = default_options.url;
+                $scope.url = default_options.url;
+                $scope.json = angular.toJson(default_options.json, true);
                 $scope.includeDefaults = default_options.includeDefaults;
                 $scope.includeEnums = default_options.includeEnums;
                 $scope.forceRequired = default_options.forceRequired;
@@ -79,7 +80,7 @@ angular.module('jsonschemaV4App')
 
             var init = function() {
                 $scope.reset();
-                $scope.schemarize($scope.inputJson);
+                $scope.schemarize();
             };
 
             // Loads UI defaults and generates schema.

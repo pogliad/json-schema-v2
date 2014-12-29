@@ -10,20 +10,20 @@ angular.module('jsonschemaV4App')
             // on this function.
 
             var self = this;
-            this.inputJson = {};
+            this.json = {};
             this.intermediateResult = {};
             this.schema = {};
 
-            this.constructBasicSchema = function(aUserInput) {
+            this.constructBasicSchema = function() {
 
-                self.inputJson = angular.fromJson(aUserInput);
+                self.json = angular.fromJson(user_defined_options.json);
 
                 // The first stage just sets up the nested structure
                 // of the schema and a few basic properties.
                 // It uses our Schema class as a model and is NOT
                 // a collection of raw JavaScript { } objects.
                 self.intermediateResult = self.schema4Object(undefined,
-                    self.inputJson);
+                    self.json);
 
                 // The second stage actually constructs the json-schema,
                 // i.e. converts Schema instances to { } JavaScript

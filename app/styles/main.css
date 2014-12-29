@@ -52,7 +52,7 @@ schema .label {
     padding:4px 10px 4px 10px;
 }
 
-textarea#inputJson, input#inputUrl {
+textarea#json, input#url {
     font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
     font-size: 12px;
 }
