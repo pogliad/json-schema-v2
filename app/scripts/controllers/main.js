@@ -86,6 +86,9 @@ angular.module('jsonschemaV4App')
             };
 
             $scope.reset = function() {
+
+                user_defined_options = angular.copy(default_options);
+
                 $scope.url = default_options.url;
                 $scope.json = angular.toJson(default_options.json, true);
                 $scope.includeDefaults = default_options.includeDefaults;
@@ -98,13 +101,13 @@ angular.module('jsonschemaV4App')
                 $scope.prettyPrint = default_options.prettyPrint;
             }
 
-            var init = function() {
+            $scope.init = function() {
                 $scope.reset();
                 $scope.schemarize();
-            };
+            }
 
             // Loads UI defaults and generates schema.
-            init();
+            $scope.init();
         }
     ]);
 
@@ -113,11 +116,14 @@ angular.module('jsonschemaV4App')
         'Schemaservice',
         function($scope, $log, $rootScope, Schemaservice) {
 
-            $scope.data = Schemaservice.getSchema();
-
-            $scope.deleteMe = function(node) {
+            $scope.deleteMe = function() {
                 console.log(1);
-            };
+            }
+
+            $scope.init = function() {
+                $scope.data = Schemaservice.getSchema();
+            }
+            $scope.init();
         }
     ]);
 
@@ -125,8 +131,12 @@ angular.module('jsonschemaV4App')
     .controller('CodeController', ['$scope', '$log',
         'Schemaservice',
         function($scope, $log, Schemaservice) {
-            $scope.datastr = Schemaservice.getSchemaAsString(
+
+            $scope.init = function() {
+                $scope.data = Schemaservice.getSchemaAsString(
                                 user_defined_options.prettyPrint);
+            }
+            $scope.init();
         }
     ]);
 
@@ -143,25 +153,18 @@ angular.module('jsonschemaV4App')
 
             $scope.setEditView = function() {
                 // Change view.
-                $scope.selected = 1;
-                // Update button style.
-                $scope.editview = "primary active";
-                $scope.codeview = "default";
+                $scope.editSchema = true;
             };
 
             $scope.setCodeView = function() {
                 // Change view.
-                $scope.selected = 2;
-                // Update button style.
-                $scope.editview = "default";
-                $scope.codeview = "primary active";
+                $scope.editSchema = false;
             };
 
-            var init = function() {
+            $scope.init = function() {
                 $scope.setCodeView();
-            };
+            }
 
-            // Loads UI defaults and generates schema.
-            init();
+            $scope.init();
         }
     ]);

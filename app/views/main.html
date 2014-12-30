@@ -96,20 +96,21 @@
             <div class="panel-body">
 
             <div class="btn-group btn-toggle">
-                <button href ng:click="setCodeView()" class="btn btn-xs btn-{{codeview}}">Code View</button>
-                <button href ng:click="setEditView()" class="btn btn-xs btn-{{editview}}">Edit View</button>
+                <button href ng:click="setCodeView()" class="btn btn-xs" ng-class="{'btn-primary active':!editSchema, 'btn-default':editSchema}">Code View</button>
+
+                <button href ng:click="setEditView()" class="btn btn-xs" ng-class="{'btn-primary':editSchema, 'btn-default':!editSchema}">Edit View</button>
             </div>
 
             <br />
             <br />
-            <div ng:show="selected == 1">
+            <div ng:show="editSchema">
                 <div ng-controller="EditController">
                     <schema class="rootSchema" data="data"></schema>
                 </div>
             </div>
-            <div ng:show="selected == 2">
+            <div ng:show="!editSchema">
                 <div ng-controller="CodeController">
-                    <pre>{{datastr}}</pre>
+                    <pre>{{data}}</pre>
                 </div>
             </div>
             </div>

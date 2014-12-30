@@ -1,6 +1,6 @@
 
 <div class="panel panel-default">
-{{data}}
+
 <div class="navbar navbar-default">
     <div class="navbar-header pull-left">
       <span class="navbar-brand" ng-click="show=!show"><a>{{data.id.replace('#','')}}</a></span>
@@ -18,8 +18,8 @@
 
 <div class="panel-body">
 
-  <form class="form-inline" role="form">
-  <div class="form-group-sm" ng-show=show>
+  <form class="form-inline" role="form" ng-show=show >
+  <div class="form-group-sm">
     <div class="row">
       <div class="col-xs-8">
         <div class="input-group input-group-sm">
