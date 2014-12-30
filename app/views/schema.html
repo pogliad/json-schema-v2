@@ -1,19 +1,13 @@
 
 <div class="panel panel-default">
 <div class="navbar navbar-default">
-    <div class="navbar-header pull-left">
-      <span class="navbar-brand" ng-click="show=!show"><a>{{data.id}}</a></span>
+    <div class="navbar-header pull-left schema-key" ng-click="show=!show">
+      <span class="navbar-brand"><a>{{data.__key__}}</a></span>
     </div>
     <div class="navbar-header pull-right">
       <button type="button" class="btn btn-xs btn-default navbar-btn" ng-click="deleteMe(data.key);">Remove</button>
     </div>
 </div>
-
-  <!--div class="panel-heading" ng-click="show=!show">
-    <span class="pull-left">{{data.id}}</span>
-    <button type="button" class="btn btn-default btn-xs pull-right">
-      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>     </button>
-  </div-->
 
 <div class="panel-body">
 

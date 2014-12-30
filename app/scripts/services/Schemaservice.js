@@ -17,7 +17,7 @@ angular.module('jsonschemaV4App')
             this.JSON2Schema = function() {
                 this.step1();
                 this.step2();
-                this.step3(self.schema);
+                this.step3();
             };
 
             this.step1 = function() {
@@ -41,13 +41,17 @@ angular.module('jsonschemaV4App')
                 self.editableSchema = angular.copy(self.schema);
             };
 
-            this.step3 = function(obj) {
-                // Remove __ __ meta data from Code schema, but don't change
+            this.step3 = function() {
+               this.clean(self.schema);
+            };
+
+            this.clean = function(obj) {
+                 // Remove __ __ meta data from Code schema, but don't change
                 // editable schema.
                 for (var k in obj)
                 {
                     if (typeof obj[k] == "object" && obj[k] !== null) {
-                        this.step3(obj[k]);
+                        this.clean(obj[k]);
                     }
                     else {
                         var res = k.match(/^__.*__$/g);
@@ -129,6 +133,7 @@ angular.module('jsonschemaV4App')
                     // absolute URL.
                     src.id = dst.id;
                 }
+                dst.__key__ = src.key;
             };
 
             this.addDefault = function(src, dst) {

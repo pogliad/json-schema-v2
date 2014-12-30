@@ -45,7 +45,11 @@ schema:hover {
 .schema-heading {
     margin-bottom:5px;
     font-size:12px;
+}
 
+schema div.schema-key {
+    cursor: pointer;
+    padding-right:50px;
 }
 
 schema .label {
@@ -68,10 +72,6 @@ schema .panel {
 schema .navbar-default a {
     color:#828282;
 }
-schema .navbar-header {
-    cursor: pointer;
-}
-
 schema .panel-body {
     padding:5px;
     margin-bottom:0px;
