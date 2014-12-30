@@ -38,7 +38,7 @@ app.constant('Specification', "http://json-schema.org/draft-04/schema#");
 
 // Assume some default values for user defined parameters.
 var default_options = {
-    url: 'http://jsonschema.net#',
+    url: 'http://jsonschema.net',
     json: testData.basic,
     // Array options.
     arrayOptions: arrayOptionsEnum.arraySchema,

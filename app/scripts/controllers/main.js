@@ -4,6 +4,8 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
     ['$compile','Schemaservice',
     function($compile, Schemaservice) {
          var RecursionHelper = {
+            // The compile function for the directive which returns the link 
+            // function.
             compile: function(tElement, tAttrs) {
 
                 var contents = tElement.contents().remove();
@@ -37,8 +39,11 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                             iElement.append(clone);
                         });
 
-                        scope.deleteMe = function(node) {
-                            console.log(node);
+                        scope.deleteMe = function(id) {
+                            console.log(iElement);
+                            console.log(iAttrs);
+                            console.log(id);
+                            //iElement.remove();
                         };
                     },
                     pre: function(scope, iElement, iAttrs) { }
@@ -82,7 +87,8 @@ angular.module('jsonschemaV4App')
                 user_defined_options.prettyPrint = $scope.prettyPrint;
 
                 // Generate basic schema structure.
-                Schemaservice.constructBasicSchema();
+                Schemaservice.JSON2Schema();
+                $rootScope.$broadcast('E_SchemaUpdated');
             };
 
             $scope.reset = function() {
@@ -106,7 +112,10 @@ angular.module('jsonschemaV4App')
                 $scope.schemarize();
             }
 
-            // Loads UI defaults and generates schema.
+            // Loads UI defaults and generates schema as soon as HTML
+            // code finds <div class="col-md-6" ng-controller="InputController">.
+            // Therefore schema is generated before OutputController and any
+            // children are initialized.
             $scope.init();
         }
     ]);
@@ -116,14 +125,19 @@ angular.module('jsonschemaV4App')
         'Schemaservice',
         function($scope, $log, $rootScope, Schemaservice) {
 
-            $scope.deleteMe = function() {
-                console.log(1);
+            $scope.init = function() {
+                $scope.data = Schemaservice.getEditableSchema();
             }
 
-            $scope.init = function() {
-                $scope.data = Schemaservice.getSchema();
-            }
+            $scope.$on('E_SchemaUpdated', function (event, data) {
+                $scope.init();
+            });
+
             $scope.init();
+
+            $scope.deleteMe = function(node) {
+                            console.log(1);
+                        };
         }
     ]);
 
@@ -136,15 +150,20 @@ angular.module('jsonschemaV4App')
                 $scope.data = Schemaservice.getSchemaAsString(
                                 user_defined_options.prettyPrint);
             }
+
+            $scope.$on('E_SchemaUpdated', function (event, data) {
+                $scope.init();
+            });
+
             $scope.init();
         }
     ]);
 
 angular.module('jsonschemaV4App')
-    .controller('OutputController', ['$scope', '$log',
+    .controller('OutputController', ['$scope', '$rootScope', '$log',
         '$location', '$anchorScroll',
         'Schemaservice', 'Version',
-        function($scope, $log, $location, $anchorScroll, Schemaservice, Version) {
+        function($scope, $rootScope, $log, $location, $anchorScroll, Schemaservice, Version) {
 
             $scope.gotoTop = function() {
                 $location.hash('top');
@@ -160,11 +179,5 @@ angular.module('jsonschemaV4App')
                 // Change view.
                 $scope.editSchema = false;
             };
-
-            $scope.init = function() {
-                $scope.setCodeView();
-            }
-
-            $scope.init();
         }
     ]);

@@ -9,26 +9,53 @@ angular.module('jsonschemaV4App')
             // on this function.
 
             var self = this;
-            this.json = {};
-            this.intermediateResult = {};
-            this.schema = {};
-            this.dirty = 0;
+            this.json = {}; // JSON provided by user.
+            this.intermediateResult = null;
+            this.editableSchema = {}; // Edit View schema (contains __).
+            this.schema = {}; // Final JSON schema for use in Code View.
 
-            this.constructBasicSchema = function() {
+            this.JSON2Schema = function() {
+                this.step1();
+                this.step2();
+                this.step3(self.schema);
+            };
+
+            this.step1 = function() {
 
                 self.json = angular.fromJson(user_defined_options.json);
 
                 // The first stage just sets up the nested structure
-                // of the schema and a few basic properties.
-                // It uses our Schema class as a model and is NOT
-                // a collection of raw JavaScript { } objects.
+                // of the schema. Any schema properties that can be set, are.
+                // It uses the Schema class as a model and is NOT
+                // a collection of raw JavaScript { } objects, i.e. it's not
+                // actually a schema.
                 self.intermediateResult = self.schema4Object(undefined,
                     self.json);
+            };
 
+            this.step2 = function() {
                 // The second stage actually constructs the json-schema,
                 // i.e. converts Schema instances to { } JavaScript
                 // objects.
                 self.schema = self.constructSchema(self.intermediateResult);
+                self.editableSchema = angular.copy(self.schema);
+            };
+
+            this.step3 = function(obj) {
+                // Remove __ __ meta data from Code schema, but don't change
+                // editable schema.
+                for (var k in obj)
+                {
+                    if (typeof obj[k] == "object" && obj[k] !== null) {
+                        this.step3(obj[k]);
+                    }
+                    else {
+                        var res = k.match(/^__.*__$/g);
+                        if (res) {
+                            delete obj[k];
+                        }
+                    }
+                }
             };
 
             this.schema4Object = function(aKey, aValue) {
@@ -44,7 +71,7 @@ angular.module('jsonschemaV4App')
                         // number, integer, string, null, boolean
                         subSchema = Schemafactory.getInstance(key, value);
                     }
-                    //subSchema.parent = schema;
+                    // This also sets the subSchema parent to schema.
                     schema.addSubSchema(subSchema);
                 })
                 return schema;
@@ -92,17 +119,10 @@ angular.module('jsonschemaV4App')
 
             this.constructId = function(src, dst) {
                 if (src.root || !user_defined_options.absoluteIds) {
-                    // For root element and RELATIVE IDs have
-                    // already been constructed.
-                    // Just copy the intermediate result.
+
                     dst.id = src.id;
                 } else if (user_defined_options.absoluteIds) {
-
-                    // ABSOLUTE IDs must be well-formed URLs,
-                    // so do a bit of tidying.
-                    var cleanParentId = (src.parent.id).replace('#', '');
-                    var cleanChildId = (src.id).replace('#', '');
-                    dst.id = (cleanParentId + "/" + cleanChildId) + '#';
+                    dst.id = (src.parent.id + "/" + src.id);
 
                     // We MUST set the parent ID to the ABSOLUTE URL
                     // so when the child builds upon it, it too is an
@@ -136,11 +156,12 @@ angular.module('jsonschemaV4App')
             this.addRequired = function(src, dst, subSchema, dstSub) {
 
                 if (!dst.required) {
-                    dst.required = []
+                    dst.required = [];
                 }
 
                 if (user_defined_options.forceRequired) {
                     dst.required.push(subSchema.key);
+                    dstSub.__required__=true;
                 }
             };
 
@@ -175,6 +196,7 @@ angular.module('jsonschemaV4App')
 
                     // Each sub-schema will need its own {} schema object.
                     var subSchema = self.constructSchema(value);
+                    subSchema.__parent__ = schema.id;
 
                     // Because the outer loop iterates over sub-schemas
                     // we make each a required property in it's parent.
@@ -213,8 +235,8 @@ angular.module('jsonschemaV4App')
                 return self.schema;
             };
 
-            this.setSchema = function(schema) {
-                self.schema = schema;
+            this.getEditableSchema = function() {
+                return self.editableSchema;
             };
 
             this.getSchemaAsString = function(pretty_print) {
