@@ -67,8 +67,6 @@
           </select>
         </div>
       </div>
-
-
     </div>
 
     <div class="row">
@@ -78,15 +76,7 @@
           <input type="text" ng-model="data.description" class="form-control input-sm">
         </div>
       </div>
-      <span ng-if="data.default">
-        <div class="col-xs-4">
-          <div class="input-group input-group-sm">
-            <div class="input-group-addon">Default</div>
-            <input type="text" ng-model="data.default" class="form-control input-sm">
-          </div>
-        </div>
-      </span>
-      <span ng-if="!data.default">
+      <span ng-if="data.type=='object' || data.type=='array'">
         <div class="col-xs-4">
           <div class="input-group input-group-sm ">
             <div class="input-group-addon">Default</div>
@@ -94,7 +84,34 @@
           </div>
         </div>
       </span>
+      <span ng-if="data.type!='object' && data.type!='array'">
+        <div class="col-xs-4">
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon">Default</div>
+            <input type="text" ng-model="data.default" class="form-control input-sm">
+          </div>
+        </div>
+      </span>
     </div>
+
+    <span ng-if="data.type=='array'">
+          <div class="row">
+            <div class="col-xs-4">
+              <div class="input-group input-group-sm">
+                <div class="input-group-addon">Min items</div>
+                <input type="text" ng-model="data.minItems" class="form-control input-sm col-xs-3" />
+              </div>
+            </div>
+            <div class="col-xs-4">
+              <div class="input-group input-group-sm">
+                <div class="input-group-addon">Max items</div>
+                <input type="text" ng-model="data.maxItems" class="form-control input-sm col-xs-6" />
+              </div>
+            </div>
+            <div class="col-xs-4"></div>
+          </div>
+        </span>
+
   </div>
 </form>
 

@@ -4,7 +4,7 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
     ['$compile','Schemaservice',
     function($compile, Schemaservice) {
          var RecursionHelper = {
-            // The compile function for the directive which returns the link 
+            // The compile function for the directive which returns the link
             // function.
             compile: function(tElement, tAttrs) {
 
@@ -85,6 +85,7 @@ angular.module('jsonschemaV4App')
                 user_defined_options.verbose = $scope.verbose;
                 user_defined_options.absoluteIds = $scope.absoluteIds;
                 user_defined_options.prettyPrint = $scope.prettyPrint;
+                user_defined_options.allowAddlProperties = $scope.allowAddlProperties;
 
                 // Generate basic schema structure.
                 Schemaservice.JSON2Schema();
@@ -105,6 +106,7 @@ angular.module('jsonschemaV4App')
                 $scope.verbose = default_options.verbose;
                 $scope.absoluteIds = default_options.absoluteIds;
                 $scope.prettyPrint = default_options.prettyPrint;
+                $scope.allowAddlProperties = default_options.allowAddlProperties;
             }
 
             $scope.init = function() {
@@ -176,6 +178,9 @@ angular.module('jsonschemaV4App')
             };
 
             $scope.setCodeView = function() {
+                // The user may have come from Edit View so assume schema
+                // has changed.
+                $rootScope.$broadcast('E_SchemaUpdated');
                 // Change view.
                 $scope.editSchema = false;
             };

@@ -49,7 +49,8 @@ var default_options = {
     absoluteIds: true,
     verbose: false,
     // Format optons.
-    prettyPrint: true
+    prettyPrint: true,
+    allowAddlProperties: false
 }
 
 // User starts with default options.
@@ -60,6 +61,12 @@ app.value('default_options', default_options);
 
 app.config(function($routeProvider) {
     $routeProvider
+         .when('/about', {
+            templateUrl: 'views/about.html',
+        })
+          .when('/contact', {
+            templateUrl: 'views/cotact.html',
+        })
         .when('/', {
             templateUrl: 'views/main.html',
         })

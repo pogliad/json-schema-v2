@@ -37,26 +37,74 @@ angular.module('jsonschemaV4App')
                 // The second stage actually constructs the json-schema,
                 // i.e. converts Schema instances to { } JavaScript
                 // objects.
-                self.schema = self.constructSchema(self.intermediateResult);
-                self.editableSchema = angular.copy(self.schema);
+                self.editableSchema = self.constructSchema(self.intermediateResult);
             };
 
             this.step3 = function() {
-               this.clean(self.schema);
+                self.schema = angular.copy(self.editableSchema);
+                this.clean(self.schema, null);
             };
 
-            this.clean = function(obj) {
-                 // Remove __ __ meta data from Code schema, but don't change
-                // editable schema.
+            this.clean = function(obj, parent) {
+
+                // Any keys in this array will be removed if empty.
+                var optionalBlanks = ['name','title','description','minItems','maxItems'];
+                var key = obj['__key__'];
+
                 for (var k in obj)
                 {
                     if (typeof obj[k] == "object" && obj[k] !== null) {
-                        this.clean(obj[k]);
+                        this.clean(obj[k], obj);
                     }
                     else {
-                        var res = k.match(/^__.*__$/g);
-                        if (res) {
+
+                        // Key specific logic.
+                        switch (String(k)) {
+
+                            case '__required__':
+
+                                if (parent) {
+                                    var required = obj[k];
+
+                                    if (required) {
+                                        if (!parent.required) {
+                                            parent.required = [];
+                                        }
+                                    parent.required.push(key);
+                                } else {
+                                    if (parent.required) {
+                                        var index = parent.required.indexOf(key);
+                                        if (index > -1) {
+                                            parent.required.splice(index, 1);
+                                        }
+                                    }
+                                }
+                            }
+
+                            case 'minItems':
+                                if (obj[k]) {
+                                    obj[k] = parseInt(obj[k]);
+                                }
+                            case 'maxItems':
+                                if (obj[k]) {
+                                    obj[k] = parseInt(obj[k]);
+                                }
+                        }
+
+                        // General logic.
+
+                        // Remove __ __ meta data from Code schema, but don't change
+                        // editable schema.
+                        var metaKey = k.match(/^__.*__$/g);
+                        if (metaKey) {
                             delete obj[k];
+                        }
+
+                        var remove = optionalBlanks.indexOf(k) >= 0;
+                        if (remove) {
+                            var strVal = String(obj[k]);
+                            var isBlank = (strVal.trim() == '');
+                            if (isBlank) delete obj[k];
                         }
                     }
                 }
@@ -158,20 +206,13 @@ angular.module('jsonschemaV4App')
             	dst.type = src.type;
             };
 
-            this.addRequired = function(src, dst, subSchema, dstSub) {
+            this.addRequired = function(src, dst) {
 
-                if (!dst.required) {
-                    dst.required = [];
-                }
-
-                if (user_defined_options.forceRequired) {
-                    dst.required.push(subSchema.key);
-                    dstSub.__required__=true;
-                }
+                dst.__required__=user_defined_options.forceRequired;
             };
 
             this.setDefaultProperties = function(src, dst) {
-                dst.additionalProperties = false;
+                dst.additionalProperties = user_defined_options.allowAddlProperties;
             }
 
             this.constructSchema = function(intermediate_schema) {
@@ -188,12 +229,15 @@ angular.module('jsonschemaV4App')
                 self.addDefault(intermediate_schema, schema);
                 self.addEnums(intermediate_schema, schema);
                 self.setDefaultProperties(intermediate_schema, schema);
+                self.addRequired(intermediate_schema, schema);
 
                 // Subschemas last.
                 // Don't actually add any properties or items, just initialize
                 // the object properties so properties and items may be added.
                 self.initProperties(intermediate_schema, schema);
                 self.initItems(intermediate_schema, schema);
+
+
 
                 // Schemas with no sub-schemas will just skip this loop and
                 // return the { } object.
@@ -205,7 +249,7 @@ angular.module('jsonschemaV4App')
 
                     // Because the outer loop iterates over sub-schemas
                     // we make each a required property in it's parent.
-                    self.addRequired(intermediate_schema, schema, value, subSchema);
+                    //self.addRequired(intermediate_schema, schema, value, subSchema);
 
                     if (intermediate_schema.isObject()) {
                         schema.properties[value.key] = subSchema;
@@ -233,7 +277,7 @@ angular.module('jsonschemaV4App')
             };
 
             this.removeSchema = function(schema) {
-                console.log(schema['id']);  
+                console.log(schema['id']);
             };
 
             this.getSchema = function() {
@@ -245,6 +289,7 @@ angular.module('jsonschemaV4App')
             };
 
             this.getSchemaAsString = function(pretty_print) {
+                this.step3();
                 var str = angular.toJson(self.schema, pretty_print);
                 str = str.replace('_$','$');
                 return str;
