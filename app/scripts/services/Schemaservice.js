@@ -57,10 +57,8 @@ angular.module('jsonschemaV4App')
                         this.clean(obj[k], obj);
                     }
                     else {
-
                         // Key specific logic.
                         switch (String(k)) {
-
                             case '__required__':
 
                                 if (parent) {
@@ -80,20 +78,14 @@ angular.module('jsonschemaV4App')
                                     }
                                 }
                             }
-
+                            case 'maxItems':
                             case 'minItems':
                                 if (obj[k]) {
                                     obj[k] = parseInt(obj[k]);
                                 }
-                            case 'maxItems':
-                                if (obj[k]) {
-                                    obj[k] = parseInt(obj[k]);
-                                }
                         }
-
                         // General logic.
-
-                        // Remove __ __ meta data from Code schema, but don't change
+                        // Remove __meta data__ from Code schema, but don't change
                         // editable schema.
                         var metaKey = k.match(/^__.*__$/g);
                         if (metaKey) {

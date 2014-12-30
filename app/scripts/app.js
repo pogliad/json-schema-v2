@@ -67,10 +67,13 @@ app.config(function($routeProvider) {
           .when('/contact', {
             templateUrl: 'views/cotact.html',
         })
+        .when('/home', {
+            templateUrl: 'views/main.html',
+        })
         .when('/', {
             templateUrl: 'views/main.html',
         })
         .otherwise({
-            redirectTo: '/'
+            redirectTo: '/main.html'
         });
 });
