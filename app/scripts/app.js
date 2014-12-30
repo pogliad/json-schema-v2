@@ -70,6 +70,9 @@ app.config(function($routeProvider) {
         .when('/home', {
             templateUrl: 'views/main.html',
         })
+        .when('/source', {
+            templateUrl: 'views/source.html',
+        })
         .when('/', {
             templateUrl: 'views/main.html',
         })
