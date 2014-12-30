@@ -40,10 +40,8 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                         });
 
                         scope.deleteMe = function(id) {
-                            console.log(iElement);
-                            console.log(iAttrs);
-                            console.log(id);
-                            //iElement.remove();
+                            iElement.remove();
+                            Schemaservice.removeSchema(id);
                         };
                     },
                     pre: function(scope, iElement, iAttrs) { }

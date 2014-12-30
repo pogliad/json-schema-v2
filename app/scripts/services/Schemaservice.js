@@ -78,11 +78,19 @@ angular.module('jsonschemaV4App')
                                     }
                                 }
                             }
+                            break;
+                            case '__removed__':
+                                if (obj[k]) {
+                                    console.log(obj[k]);
+                                    // delete obj;
+                                }
+                                break;
                             case 'maxItems':
                             case 'minItems':
                                 if (obj[k]) {
                                     obj[k] = parseInt(obj[k]);
                                 }
+                                break;
                         }
                         // General logic.
                         // Remove __meta data__ from Code schema, but don't change
@@ -268,8 +276,26 @@ angular.module('jsonschemaV4App')
                 return schema;
             };
 
-            this.removeSchema = function(schema) {
-                console.log(schema['id']);
+            this.removeSchemaById = function(obj, id) {
+
+                for (var k in obj)
+                {
+                    if (typeof obj[k] == "object" && obj[k] !== null) {
+                        this.removeSchemaById(obj[k], id);
+                    }
+
+                    switch (String(k)) {
+                        case 'id':
+                            if (obj[k] == id) {
+                                obj.__removed__ = true;
+                                console.log(id);
+                            }
+                    }
+                }
+            }
+
+            this.removeSchema = function(id) {
+                this.removeSchemaById(self.editableSchema, id);
             };
 
             this.getSchema = function() {
