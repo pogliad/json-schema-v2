@@ -30,7 +30,8 @@ var arrayOptionsEnum = {
     arraySchema: "schemaArray",
     emptySchema: "emptySchema",
     anyOf: "anyOf",
-    oneOf: "oneOf"
+    oneOf: "oneOf",
+    allOf: "allOf"
 };
 
 // User cannot change these values.
