@@ -39,6 +39,7 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                             iElement.append(clone);
                         });
 
+                        scope.user_defined_options = user_defined_options;
                         scope.deleteMe = function(id) {
                             iElement.remove();
                             Schemaservice.removeSchema(id);
@@ -134,7 +135,6 @@ angular.module('jsonschemaV4App')
             });
 
             $scope.init();
-
             $scope.deleteMe = function(node) {
                             console.log(1);
                         };

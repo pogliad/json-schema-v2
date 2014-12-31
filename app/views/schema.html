@@ -2,7 +2,17 @@
 <div class="panel panel-default">
 <div class="navbar navbar-default">
     <div class="navbar-header pull-left schema-key" ng-click="show=!show">
-      <span class="navbar-brand"><a>{{data.__key__}}</a></span>
+      <span class="navbar-brand">
+
+      <a ng-if="!data.__root__">
+        {{data.id.replace(user_defined_options.url,'')}}
+      </a>
+      <a ng-if="data.__root__">
+        {{user_defined_options.url}}
+      </a>
+
+
+      </span>
     </div>
     <div class="navbar-header pull-right">
       <button type="button" class="btn btn-xs btn-default navbar-btn" ng-click="deleteMe(data.id);">

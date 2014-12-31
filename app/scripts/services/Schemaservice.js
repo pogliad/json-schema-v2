@@ -101,7 +101,7 @@ angular.module('jsonschemaV4App')
                         }
 
                         var remove = optionalBlanks.indexOf(k) >= 0;
-                        if (remove) {
+                        if (remove && !user_defined_options.verbose) {
                             var strVal = String(obj[k]);
                             var isBlank = (strVal.trim() == '');
                             if (isBlank) delete obj[k];
@@ -131,9 +131,9 @@ angular.module('jsonschemaV4App')
 
             this.makeVerbose = function(src, dst) {
                 if (user_defined_options.verbose) {
-                    dst.title = src.title;
-                    dst.description = src.description;
-                    dst.name = src.name;
+                    dst.title = '';
+                    dst.description = '';
+                    dst.name = '';
 
                     if (src.isNumber() || src.isInteger()) {
                         dst.minimum = 0;
@@ -221,6 +221,7 @@ angular.module('jsonschemaV4App')
                 if (intermediate_schema.root) {
                     // Explicitly declare this JSON as JSON schema.
                     schema._$schema = Specification;
+                    schema.__root__ = true;
                 }
 
                 self.constructId(intermediate_schema, schema);
