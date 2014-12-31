@@ -48,7 +48,9 @@ angular.module('jsonschemaV4App')
             this.clean = function(obj, parent) {
 
                 // Any keys in this array will be removed if empty.
-                var optionalBlanks = ['name','title','description','minItems','maxItems'];
+                var optionalBlank = ['name','title','description','minItems','maxItems'];
+                // Any keys in this array will be removed if false.
+                var optionalBoolean = ['exclusiveMinimum', 'exclusiveMaximum', 'additionalProperties']
                 var key = obj['__key__'];
 
                 for (var k in obj)
@@ -100,11 +102,19 @@ angular.module('jsonschemaV4App')
                             delete obj[k];
                         }
 
-                        var remove = optionalBlanks.indexOf(k) >= 0;
+                        var remove = optionalBlank.indexOf(k) >= 0;
+
                         if (remove && !user_defined_options.verbose) {
                             var strVal = String(obj[k]);
                             var isBlank = (strVal.trim() == '');
                             if (isBlank) delete obj[k];
+                        }
+
+                        remove = optionalBoolean.indexOf(k) >= 0;
+
+                        if (remove && !user_defined_options.verbose) {
+                            var boolVal = Boolean(obj[k]);
+                            if (!boolVal) delete obj[k];
                         }
                     }
                 }
@@ -158,13 +168,25 @@ angular.module('jsonschemaV4App')
 
             this.initItems = function(src, dst) {
                 if (src.isArray()) {
-                    if (src.subSchemas.length > 1) {
-                    	// The user may have selected Single Schema
-                    	// but if so, we just add an entire schema object
-                    	// which overwrites this array.
-                        dst.items = [];
-                    } else {
-                        dst.items = {};
+                    switch(user_defined_options.arrayOptions) {
+
+                        case ArrayOptions.emptySchema:
+                            dst.items = {};
+                            break;
+                        case ArrayOptions.singleSchema:
+                            dst.items = {};
+                            break;
+                        case ArrayOptions.anyOf:
+                            dst.items = {};
+                            dst.items.anyOf = [];
+                            break;
+                        case ArrayOptions.oneOf:
+                            dst.items = {};
+                            dst.items.oneOf = [];
+                            break;
+                        case ArrayOptions.arraySchema:
+                            dst.items = [];
+                            break;
                     }
                 }
             };
@@ -215,6 +237,10 @@ angular.module('jsonschemaV4App')
                 dst.additionalProperties = user_defined_options.allowAddlProperties;
             }
 
+            this.completeArrayOptions = function(src, dst) {
+
+            }
+
             this.constructSchema = function(intermediate_schema) {
                 var schema = {};
 
@@ -238,8 +264,6 @@ angular.module('jsonschemaV4App')
                 self.initProperties(intermediate_schema, schema);
                 self.initItems(intermediate_schema, schema);
 
-
-
                 // Schemas with no sub-schemas will just skip this loop and
                 // return the { } object.
                 angular.forEach(intermediate_schema.subSchemas, function(value, key) {
@@ -257,23 +281,33 @@ angular.module('jsonschemaV4App')
 
                     } else if (intermediate_schema.isArray()) {
 
-                        if (user_defined_options.arrayOptions ==
-                                                ArrayOptions.emptySchema) {
-                            schema.items = {};
-                        } else if (user_defined_options.arrayOptions ==
-                                                ArrayOptions.singleSchema) {
-                            schema.items = subSchema;
-                        } else {
-                            // 	Use array of schemas, however, still may only be one.
-                            if (intermediate_schema.subSchemas.length > 1) {
-                                schema.items.push(subSchema);
-                            } else {
+                        switch(user_defined_options.arrayOptions) {
+
+                            case ArrayOptions.emptySchema:
+                                schema.items = {};
+                                break;
+                            case ArrayOptions.singleSchema:
                                 schema.items = subSchema;
-                            }
+                                break;
+                            case ArrayOptions.anyOf:
+                                schema.items.anyOf.push(subSchema);
+                                break;
+                            case ArrayOptions.oneOf:
+                                schema.items.oneOf.push(subSchema);
+                                break;
+                            case ArrayOptions.arraySchema:
+                                //  Use array of schemas, however, still may only be one.
+                                if (intermediate_schema.subSchemas.length > 1) {
+                                    schema.items.push(subSchema);
+                                } else {
+                                    schema.items = subSchema;
+                                }
+                                break;
+                            default:
+                            break;
                         }
                     }
                 });
-
                 return schema;
             };
 

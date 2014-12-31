@@ -8,7 +8,7 @@ var testData = {
         },
         "phoneNumber": [{
             "location": "home",
-            "number": "212 555-1234"
+            "code": 44
         }]
     },
 
@@ -28,7 +28,9 @@ var app = angular.module('jsonschemaV4App', [
 var arrayOptionsEnum = {
     singleSchema: "singleSchema",
     arraySchema: "schemaArray",
-    emptySchema: "emptySchema"
+    emptySchema: "emptySchema",
+    anyOf: "anyOf",
+    oneOf: "oneOf"
 };
 
 // User cannot change these values.
@@ -72,6 +74,12 @@ app.config(function($routeProvider) {
         })
         .when('/source', {
             templateUrl: 'views/source.html',
+        })
+        .when('/resources', {
+            templateUrl: 'views/resources.html',
+        })
+        .when('/blog', {
+            templateUrl: 'views/blog.html',
         })
         .when('/', {
             templateUrl: 'views/main.html',
