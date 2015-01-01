@@ -230,7 +230,11 @@ angular.module('jsonschemaV4App')
 
             this.addRequired = function(src, dst) {
 
-                dst.__required__=user_defined_options.forceRequired;
+                // TODO: Check this?
+                // Don't allow array indexes to be 'required'
+                if (!src.type=='array') {
+                    dst.__required__=user_defined_options.forceRequired;
+                }
             };
 
             this.setDefaultProperties = function(src, dst) {
