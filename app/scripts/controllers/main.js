@@ -40,11 +40,21 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                             iElement.append(clone);
                         });
 
+    
                         scope.user_defined_options = user_defined_options;
+
                         scope.deleteMe = function(id) {
                             iElement.remove();
                             Schemaservice.removeSchema(id);
                         };
+
+                        // The listener function.
+                        scope.$watch(function() { 
+                            console.log(1);
+                            return Schemaservice.editableSchema;
+                        });
+
+ 
                     },
                     pre: function(scope, iElement, iAttrs) { }
                 }
@@ -65,11 +75,6 @@ angular.module('jsonschemaV4App').directive("schema", function(RecursionHelper) 
             return RecursionHelper.compile(tElement, tAttributes);
         }
     };
-
-    $scope.$watch($scope.data, function(value) {
-                            // do something with the new value
-                            console.log(2);
-                        });
 });
 
 angular.module('jsonschemaV4App')
@@ -141,7 +146,6 @@ angular.module('jsonschemaV4App')
 
             $scope.init = function() {
                 $scope.data = Schemaservice.getEditableSchema();
-                console.log(1);
             }
 
             $scope.$on('E_SchemaUpdated', function (event, data) {
