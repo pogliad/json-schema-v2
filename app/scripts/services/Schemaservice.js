@@ -32,6 +32,7 @@ angular.module('jsonschemaV4App')
              */
             this.step1 = function() {
                 self.json = angular.fromJson(user_defined_options.json);
+
                 self.intermediateResult = self.schema4Object(undefined,
                     self.json);
             };
@@ -391,6 +392,11 @@ angular.module('jsonschemaV4App')
 
             this.getEditableSchema = function() {
                 return self.editableSchema;
+            };
+
+            this.getFormattedJSON = function() {
+                // Format user's JSON just to be nice :)
+                return angular.toJson(self.json, true);
             };
 
             this.getSchemaAsString = function(pretty_print) {

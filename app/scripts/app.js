@@ -69,7 +69,7 @@ app.config(function($routeProvider) {
             templateUrl: 'views/about.html',
         })
         .when('/contact', {
-            templateUrl: 'views/cotact.html',
+            templateUrl: 'views/contact.html',
         })
         .when('/home', {
             templateUrl: 'views/main.html',

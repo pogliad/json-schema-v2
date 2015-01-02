@@ -40,21 +40,13 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                             iElement.append(clone);
                         });
 
-    
+
                         scope.user_defined_options = user_defined_options;
 
                         scope.deleteMe = function(id) {
                             iElement.remove();
                             Schemaservice.removeSchema(id);
                         };
-
-                        // The listener function.
-                        scope.$watch(function() { 
-                            console.log(1);
-                            return Schemaservice.editableSchema;
-                        });
-
- 
                     },
                     pre: function(scope, iElement, iAttrs) { }
                 }
@@ -103,6 +95,7 @@ angular.module('jsonschemaV4App')
 
                 // Generate basic schema structure.
                 Schemaservice.JSON2Schema();
+                $scope.json = Schemaservice.getFormattedJSON();
                 $rootScope.$broadcast('E_SchemaUpdated');
             };
 
