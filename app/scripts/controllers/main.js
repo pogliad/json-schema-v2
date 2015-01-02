@@ -81,10 +81,15 @@ angular.module('jsonschemaV4App')
                 user_defined_options.forceRequired = $scope.forceRequired;
                 user_defined_options.emptySchemas = $scope.emptySchemas;
                 user_defined_options.arrayOptions = $scope.arrayOptions;
-                user_defined_options.verbose = $scope.verbose;
                 user_defined_options.absoluteIds = $scope.absoluteIds;
                 user_defined_options.prettyPrint = $scope.prettyPrint;
-                user_defined_options.allowAddlProperties = $scope.allowAddlProperties;
+                user_defined_options.numericVerbose = $scope.numericVerbose;
+                user_defined_options.stringsVerbose = $scope.stringsVerbose;
+                user_defined_options.objectsVerbose = $scope.objectsVerbose;
+                user_defined_options.arraysVerbose = $scope.arraysVerbose;
+                user_defined_options.metadataKeywords = $scope.metadataKeywords;
+                user_defined_options.numericVerbose = $scope.numericVerbose;
+
 
                 // Generate basic schema structure.
                 Schemaservice.JSON2Schema();
@@ -102,10 +107,14 @@ angular.module('jsonschemaV4App')
                 $scope.forceRequired = default_options.forceRequired;
                 $scope.emptySchemas = default_options.emptySchemas;
                 $scope.arrayOptions = default_options.arrayOptions;
-                $scope.verbose = default_options.verbose;
                 $scope.absoluteIds = default_options.absoluteIds;
                 $scope.prettyPrint = default_options.prettyPrint;
-                $scope.allowAddlProperties = default_options.allowAddlProperties;
+                $scope.numericVerbose = default_options.numericVerbose;
+                $scope.stringsVerbose = default_options.stringsVerbose;
+                $scope.objectsVerbose = default_options.objectsVerbose;
+                $scope.arraysVerbose = default_options.arraysVerbose;
+                $scope.metadataKeywords = default_options.metadataKeywords;
+                $scope.numericVerbose = default_options.numericVerbose;
             }
 
             $scope.init = function() {

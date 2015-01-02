@@ -47,10 +47,6 @@ angular.module('jsonschemaV4App')
 
             this.clean = function(obj, parent) {
 
-                // Any keys in this array will be removed if empty.
-                var optionalBlank = ['name','title','description','minItems','maxItems'];
-                // Any keys in this array will be removed if false.
-                var optionalBoolean = ['exclusiveMinimum', 'exclusiveMaximum', 'additionalProperties']
                 var key = obj['__key__'];
 
                 for (var k in obj)
@@ -89,10 +85,44 @@ angular.module('jsonschemaV4App')
                                 break;
                             case 'maxItems':
                             case 'minItems':
-                                if (obj[k]) {
-                                    obj[k] = parseInt(obj[k]);
+                            case 'minimum':
+                            case 'maximum':
+                            case 'multipleOf':
+                                var val = parseInt(obj[k]);
+                                obj[k] = val;
+                                if (!val && val != 0) {
+                                    delete obj[k];
                                 }
                                 break;
+                            case 'exclusiveMinimum':
+                            case 'exclusiveMaximum':
+                                var val = Boolean(obj[k]);
+                                obj[k] = val;
+                                if (!user_defined_options.numericVerbose) {
+                                    if (!val) {
+                                        delete obj[k];
+                                    }
+                                }
+                                break;
+                            case 'name':
+                            case 'title':
+                            case 'description':
+                                var val = String(obj[k]).trim();
+                                obj[k] = val;
+                                if (!user_defined_options.metadataKeywords) {
+                                    if (!val) {
+                                        delete obj[k];
+                                    }
+                                }
+                                break;
+                            case 'additionalProperties':
+                                var val = Boolean(obj[k]);
+                                obj[k] = val;
+                                if (!user_defined_options.objectsVerbose) {
+                                    if (!val) {
+                                        delete obj[k];
+                                    }
+                                }
                         }
                         // General logic.
                         // Remove __meta data__ from Code schema, but don't change
@@ -100,21 +130,6 @@ angular.module('jsonschemaV4App')
                         var metaKey = k.match(/^__.*__$/g);
                         if (metaKey) {
                             delete obj[k];
-                        }
-
-                        var remove = optionalBlank.indexOf(k) >= 0;
-
-                        if (remove && !user_defined_options.verbose) {
-                            var strVal = String(obj[k]);
-                            var isBlank = (strVal.trim() == '');
-                            if (isBlank) delete obj[k];
-                        }
-
-                        remove = optionalBoolean.indexOf(k) >= 0;
-
-                        if (remove && !user_defined_options.verbose) {
-                            var boolVal = Boolean(obj[k]);
-                            if (!boolVal) delete obj[k];
                         }
                     }
                 }
@@ -140,23 +155,42 @@ angular.module('jsonschemaV4App')
             };
 
             this.makeVerbose = function(src, dst) {
-                if (user_defined_options.verbose) {
-                    dst.title = '';
-                    dst.description = '';
-                    dst.name = '';
 
-                    if (src.isNumber() || src.isInteger()) {
-                        dst.minimum = 0;
-                    }
+                switch(src.type) {
+                    case 'array':
+                        if (user_defined_options.arraysVerbose) {
+                            dst.minItems = 0;
+                            dst.uniqueItems = false;
+                        }
+                        break;
+                    case 'object':
+                        if (user_defined_options.objectsVerbose) {
+                            dst.additionalProperties = true;
+                        }
+                        break;
+                    case 'integer':
+                    case 'number':
+                        if (user_defined_options.numericVerbose) {
+                            dst.multipleOf = 1;
+                            dst.maximum = 100;
+                            dst.minimum = 0;
+                            dst.exclusiveMaximum = false;
+                            dst.exclusiveMinimum = false;
+                        }
+                        break;
+                    case 'string':
+                        if (user_defined_options.stringsVerbose) {
+                            dst.minLength = 0;
+                        }
+                    case 'boolean':
+                    case 'null':
+                        break;
+                }
 
-                    if (src.isArray()) {
-                        dst.minItems = 0;
-                        dst.uniqueItems = false;
-                    }
-
-                    if (src.isString()) {
-                        dst.minLength = 0;
-                    }
+                if (user_defined_options.metadataKeywords) {
+                    dst.title = src.title;
+                    dst.description = src.description;
+                    dst.name = src.name;
                 }
             };
 
@@ -237,10 +271,6 @@ angular.module('jsonschemaV4App')
                 }
             };
 
-            this.setDefaultProperties = function(src, dst) {
-                dst.additionalProperties = user_defined_options.allowAddlProperties;
-            }
-
             this.completeArrayOptions = function(src, dst) {
 
             }
@@ -259,7 +289,6 @@ angular.module('jsonschemaV4App')
                 self.makeVerbose(intermediate_schema, schema);
                 self.addDefault(intermediate_schema, schema);
                 self.addEnums(intermediate_schema, schema);
-                self.setDefaultProperties(intermediate_schema, schema);
                 self.addRequired(intermediate_schema, schema);
 
                 // Subschemas last.
@@ -285,6 +314,7 @@ angular.module('jsonschemaV4App')
 
                     } else if (intermediate_schema.isArray()) {
 
+                        // TODO: Move to this.initItems()
                         switch(user_defined_options.arrayOptions) {
 
                             case ArrayOptions.emptySchema:

@@ -16,8 +16,9 @@ angular.module('jsonschemaV4App')
                 this.key = this.root ? '/' : String(aKey);
                 this.id = this.root ? user_defined_options.url : String(aKey);
                 this.type = Utility.getType(aValue);
-                this.title = this.root ? 'root' : '';
-
+                this.title = this.root ? 'Root schema.' : String(aKey)[0].toUpperCase() + String(aKey).slice(1) + ' schema.';
+                this.description = 'An explanation about the puropose of this instance described by this schema.';
+                this.name = this.root ? '/' : String(aKey);
                 if (user_defined_options.includeDefaults && isPrimitiveType) {
                     this.defaultValue = aValue;
                 }

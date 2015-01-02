@@ -50,10 +50,13 @@ var default_options = {
     includeEnums: false,
     forceRequired: true,
     absoluteIds: true,
-    verbose: false,
     // Format optons.
     prettyPrint: true,
-    allowAddlProperties: false
+    numericVerbose: false,
+    stringsVerbose: false,
+    objectsVerbose: false,
+    arraysVerbose: false,
+    metadataKeywords: false,
 }
 
 // User starts with default options.
