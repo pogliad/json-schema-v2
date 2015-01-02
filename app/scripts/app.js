@@ -50,8 +50,6 @@ var default_options = {
     includeEnums: false,
     forceRequired: true,
     absoluteIds: true,
-    // Format optons.
-    prettyPrint: true,
     numericVerbose: false,
     stringsVerbose: false,
     objectsVerbose: false,
