@@ -5,14 +5,18 @@ angular.module('jsonschemaV4App')
         'ArrayOptions','Specification',
         function Schemaservice($log, Schemafactory,
             ArrayOptions,Specification) {
-            // AngularJS will instantiate a singleton by calling "new"
-            // on this function.
+
+            /* AngularJS will instantiate a singleton by calling "new"
+            on this function. */
 
             var self = this;
-            this.json = {}; // JSON provided by user.
+            // Input JSON provided by user.
+            this.json = {};
             this.intermediateResult = null;
-            this.editableSchema = {}; // Edit View schema (contains __).
-            this.schema = {}; // Final JSON schema for use in Code View.
+            // Edit View schema (contains __meatadata__ properties).
+            this.editableSchema = {};
+            // Final JSON schema for use in Code View.
+            this.schema = {};
 
             this.JSON2Schema = function() {
                 this.step1();
@@ -20,42 +24,61 @@ angular.module('jsonschemaV4App')
                 this.step3();
             };
 
+            /**
+             * Sets up the nested structure of the schema. Any schema
+             * properties that can be set, are. It uses the Schema class as a
+             * model and is NOT a collection of raw JavaScript { } objects,
+             * i.e. it's not actually a JSON schema.
+             */
             this.step1 = function() {
-
                 self.json = angular.fromJson(user_defined_options.json);
-
-                // The first stage just sets up the nested structure
-                // of the schema. Any schema properties that can be set, are.
-                // It uses the Schema class as a model and is NOT
-                // a collection of raw JavaScript { } objects, i.e. it's not
-                // actually a schema.
                 self.intermediateResult = self.schema4Object(undefined,
                     self.json);
             };
 
+            /**
+            * Converts our custom Schema instances to real JavaScript objects.
+            * __metadata__ keys are added at this point.
+            */
             this.step2 = function() {
-                // The second stage actually constructs the json-schema,
-                // i.e. converts Schema instances to { } JavaScript
-                // objects.
                 self.editableSchema = self.constructSchema(self.intermediateResult);
             };
 
+            /**
+            * Copies JavaScript object for the editable view and starts the
+            * process of producing a valid JSON Schema.
+            */
             this.step3 = function() {
                 self.schema = angular.copy(self.editableSchema);
                 this.clean(self.schema, null);
             };
 
+            /**
+            * Takes any action on __metadata__ keys.
+            * Tidy any properties, for example checking types.
+            * Finally removes any __metadata__ properites.
+            * The resulting JavaScript object is a valid JSON Schema.
+            * @param {object} obj A copy of the pseudo JSON schema contining
+                __metadata__.
+            * @param {object} parent Parent JavaScript object used for setting
+                up the 'required' property from __required__ metadata.
+            */
             this.clean = function(obj, parent) {
-
                 var key = obj['__key__'];
 
                 for (var k in obj)
                 {
                     if (typeof obj[k] == "object" && obj[k] !== null) {
+                        if (obj[k].__removed__) {
+                            delete obj[k];
+                            continue;
+                        }
+                        // Recursive call parsing in parent object this time.
                         this.clean(obj[k], obj);
                     }
                     else {
                         // Key specific logic.
+
                         switch (String(k)) {
                             case '__required__':
 
@@ -78,10 +101,6 @@ angular.module('jsonschemaV4App')
                             }
                             break;
                             case '__removed__':
-                                if (obj[k]) {
-                                    console.log(obj[k]);
-                                    // delete obj;
-                                }
                                 break;
                             case 'maxItems':
                             case 'minItems':
@@ -357,7 +376,6 @@ angular.module('jsonschemaV4App')
                         case 'id':
                             if (obj[k] == id) {
                                 obj.__removed__ = true;
-                                console.log(id);
                             }
                     }
                 }

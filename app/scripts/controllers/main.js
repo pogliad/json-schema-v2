@@ -14,6 +14,7 @@ angular.module('jsonschemaV4App').factory('RecursionHelper',
                 // postLink function.
                 return {
                     post: function(scope, iElement, iAttrs) {
+
                         if (!compiledContents) {
                             /*
                             Note: The compile function cannot handle directives that
@@ -64,6 +65,11 @@ angular.module('jsonschemaV4App').directive("schema", function(RecursionHelper) 
             return RecursionHelper.compile(tElement, tAttributes);
         }
     };
+
+    $scope.$watch($scope.data, function(value) {
+                            // do something with the new value
+                            console.log(2);
+                        });
 });
 
 angular.module('jsonschemaV4App')
@@ -135,6 +141,7 @@ angular.module('jsonschemaV4App')
 
             $scope.init = function() {
                 $scope.data = Schemaservice.getEditableSchema();
+                console.log(1);
             }
 
             $scope.$on('E_SchemaUpdated', function (event, data) {
@@ -142,9 +149,6 @@ angular.module('jsonschemaV4App')
             });
 
             $scope.init();
-            $scope.deleteMe = function(node) {
-                            console.log(1);
-                        };
         }
     ]);
 
