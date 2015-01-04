@@ -17,6 +17,8 @@ angular.module('jsonschemaV4App')
             this.editableSchema = {};
             // Final JSON schema for use in Code View.
             this.schema = {};
+            //
+            this.exception = null;
 
             this.JSON2Schema = function() {
                 this.step1();
@@ -31,8 +33,9 @@ angular.module('jsonschemaV4App')
              * i.e. it's not actually a JSON schema.
              */
             this.step1 = function() {
-                self.json = angular.fromJson(user_defined_options.json);
 
+
+                self.json = angular.fromJson(user_defined_options.json);
                 self.intermediateResult = self.schema4Object(undefined,
                     self.json);
             };
@@ -42,6 +45,7 @@ angular.module('jsonschemaV4App')
             * __metadata__ keys are added at this point.
             */
             this.step2 = function() {
+                if (self.exception) return;
                 self.editableSchema = self.constructSchema(self.intermediateResult);
             };
 
@@ -50,6 +54,7 @@ angular.module('jsonschemaV4App')
             * process of producing a valid JSON Schema.
             */
             this.step3 = function() {
+                if (self.exception) return;
                 self.schema = angular.copy(self.editableSchema);
                 this.clean(self.schema, null);
             };
@@ -110,8 +115,10 @@ angular.module('jsonschemaV4App')
                             case 'multipleOf':
                                 var val = parseInt(obj[k]);
                                 obj[k] = val;
-                                if (!val && val != 0) {
-                                    delete obj[k];
+                                if (!user_defined_options.numericVerbose) {
+                                    if (!val && val != 0) {
+                                        delete obj[k];
+                                    }
                                 }
                                 break;
                             case 'exclusiveMinimum':
@@ -143,6 +150,16 @@ angular.module('jsonschemaV4App')
                                         delete obj[k];
                                     }
                                 }
+                                break;
+                            case 'uniqueItems':
+                                var val = Boolean(obj[k]);
+                                obj[k] = val;
+                                if (!user_defined_options.arraysVerbose) {
+                                    if (!val) {
+                                        delete obj[k];
+                                    }
+                                }
+
                         }
                         // General logic.
                         // Remove __meta data__ from Code schema, but don't change
@@ -179,7 +196,7 @@ angular.module('jsonschemaV4App')
                 switch(src.type) {
                     case 'array':
                         if (user_defined_options.arraysVerbose) {
-                            dst.minItems = 0;
+                            dst.minItems = 1;
                             dst.uniqueItems = false;
                         }
                         break;
@@ -193,7 +210,7 @@ angular.module('jsonschemaV4App')
                         if (user_defined_options.numericVerbose) {
                             dst.multipleOf = 1;
                             dst.maximum = 100;
-                            dst.minimum = 0;
+                            dst.minimum = 1;
                             dst.exclusiveMaximum = false;
                             dst.exclusiveMinimum = false;
                         }

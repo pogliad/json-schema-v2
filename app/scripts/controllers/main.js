@@ -69,6 +69,7 @@ angular.module('jsonschemaV4App').directive("schema", function(RecursionHelper) 
     };
 });
 
+
 angular.module('jsonschemaV4App')
     .controller('InputController', ['$scope', '$log', '$rootScope',
         'Schemaservice',
@@ -95,6 +96,10 @@ angular.module('jsonschemaV4App')
 
                 // Generate basic schema structure.
                 Schemaservice.JSON2Schema();
+
+                if (Schemaservice.exception) {
+
+                }
                 $scope.json = Schemaservice.getFormattedJSON();
                 $rootScope.$broadcast('E_SchemaUpdated');
             };
