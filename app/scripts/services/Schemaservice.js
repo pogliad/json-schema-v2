@@ -2,9 +2,9 @@
 
 angular.module('jsonschemaV4App')
     .service('Schemaservice', ['$log', 'Schemafactory',
-        'ArrayOptions','Specification',
+        'ArrayOptions','Specification','Utility',
         function Schemaservice($log, Schemafactory,
-            ArrayOptions,Specification) {
+            ArrayOptions,Specification,Utility) {
 
             /* AngularJS will instantiate a singleton by calling "new"
             on this function. */
@@ -83,9 +83,12 @@ angular.module('jsonschemaV4App')
                         this.clean(obj[k], obj);
                     }
                     else {
-                        // Key specific logic.
+
 
                         switch (String(k)) {
+                            /*
+                            Metadata keywords.
+                            */
                             case '__required__':
 
                                 if (parent) {
@@ -108,8 +111,27 @@ angular.module('jsonschemaV4App')
                             break;
                             case '__removed__':
                                 break;
+                            /*
+                            Keywords for arrays.
+                            */
                             case 'maxItems':
                             case 'minItems':
+                                break;
+                            case 'uniqueItems':
+                                var val = Boolean(obj[k]);
+                                obj[k] = val;
+                                if (!user_defined_options.arraysVerbose) {
+                                    if (!val) {
+                                        delete obj[k];
+                                    }
+                                }
+                                break;
+                            case 'additionalItems':
+                                break;
+                            /*
+                            Keywords for numeric instances (number and
+                            integer).
+                            */
                             case 'minimum':
                             case 'maximum':
                             case 'multipleOf':
@@ -131,6 +153,9 @@ angular.module('jsonschemaV4App')
                                     }
                                 }
                                 break;
+                            /*
+                            Metadata keywords.
+                            */
                             case 'name':
                             case 'title':
                             case 'description':
@@ -142,6 +167,9 @@ angular.module('jsonschemaV4App')
                                     }
                                 }
                                 break;
+                            /*
+                            Keywords for objects.
+                            */
                             case 'additionalProperties':
                                 var val = Boolean(obj[k]);
                                 obj[k] = val;
@@ -151,14 +179,7 @@ angular.module('jsonschemaV4App')
                                     }
                                 }
                                 break;
-                            case 'uniqueItems':
-                                var val = Boolean(obj[k]);
-                                obj[k] = val;
-                                if (!user_defined_options.arraysVerbose) {
-                                    if (!val) {
-                                        delete obj[k];
-                                    }
-                                }
+
 
                         }
                         // General logic.
@@ -196,7 +217,7 @@ angular.module('jsonschemaV4App')
                 switch(src.type) {
                     case 'array':
                         if (user_defined_options.arraysVerbose) {
-                            dst.minItems = 1;
+                            dst.minItems = 0;
                             dst.uniqueItems = false;
                         }
                         break;
@@ -210,7 +231,7 @@ angular.module('jsonschemaV4App')
                         if (user_defined_options.numericVerbose) {
                             dst.multipleOf = 1;
                             dst.maximum = 100;
-                            dst.minimum = 1;
+                            dst.minimum = 0;
                             dst.exclusiveMaximum = false;
                             dst.exclusiveMinimum = false;
                         }

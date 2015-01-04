@@ -3,7 +3,7 @@
 angular.module('jsonschemaV4App')
     .service('Utility', function Utility() {
         // AngularJS will instantiate a singleton by calling "new" on this function
-        // 
+        //
 
         this.getType = function(aValue) {
 
