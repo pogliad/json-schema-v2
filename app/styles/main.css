@@ -28,6 +28,10 @@ schema {
     font-size: 12px;
 }
 
+.alert {
+    padding:10px;
+    margin-bottom:5px;
+}
 
 schema.rootSchema {
     margin-left: 0px;

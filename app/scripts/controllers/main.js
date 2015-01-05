@@ -75,6 +75,11 @@ angular.module('jsonschemaV4App')
         'Schemaservice',
         function($scope, $log, $rootScope, Schemaservice) {
 
+            $scope.validateJSON = function() {
+                $scope.error = !Schemaservice.isValidJSON($scope.json);
+            };
+
+
             $scope.schemarize = function() {
 
                 // Update app options in case the user defined new values.

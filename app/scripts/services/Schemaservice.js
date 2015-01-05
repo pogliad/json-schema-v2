@@ -21,9 +21,31 @@ angular.module('jsonschemaV4App')
             this.exception = null;
 
             this.JSON2Schema = function() {
+                this.step0();
                 this.step1();
                 this.step2();
                 this.step3();
+            };
+
+            this.isValidJSON = function(json) {
+                try {
+                    angular.fromJson(json);
+                } catch(e) {
+                    return false;
+                }
+
+                return true;
+            };
+
+            /**
+             *
+             */
+            this.step0 = function() {
+                try {
+                    self.json = angular.fromJson(user_defined_options.json);
+                } catch(e) {
+                    self.exception = e;
+                }
             };
 
             /**
@@ -33,9 +55,7 @@ angular.module('jsonschemaV4App')
              * i.e. it's not actually a JSON schema.
              */
             this.step1 = function() {
-
-
-                self.json = angular.fromJson(user_defined_options.json);
+                if (self.exception) return;
                 self.intermediateResult = self.schema4Object(undefined,
                     self.json);
             };
@@ -138,6 +158,7 @@ angular.module('jsonschemaV4App')
                                 var val = parseInt(obj[k]);
                                 obj[k] = val;
                                 if (!user_defined_options.numericVerbose) {
+                                    // Only delete if defaut value.
                                     if (!val && val != 0) {
                                         delete obj[k];
                                     }
@@ -430,6 +451,11 @@ angular.module('jsonschemaV4App')
 
             this.getEditableSchema = function() {
                 return self.editableSchema;
+            };
+
+            this.formatJSON = function(json) {
+                // Format user's JSON just to be nice :)
+                return angular.toJson(angular.fromJson(json), true);
             };
 
             this.getFormattedJSON = function() {
