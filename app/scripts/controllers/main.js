@@ -76,12 +76,15 @@ angular.module('jsonschemaV4App')
         function($scope, $log, $rootScope, Schemaservice) {
 
             $scope.validateJSON = function() {
-                $scope.error = !Schemaservice.isValidJSON($scope.json);
+                $scope.inputError = !Schemaservice.isValidJSON($scope.json);
             };
 
 
             $scope.schemarize = function() {
 
+                if (!Schemaservice.isValidJSON($scope.json)) {
+                    return;
+                }
                 // Update app options in case the user defined new values.
                 user_defined_options.url = $scope.url;
                 user_defined_options.json = $scope.json;
@@ -113,6 +116,7 @@ angular.module('jsonschemaV4App')
 
                 user_defined_options = angular.copy(default_options);
 
+                $scope.inputError = false;
                 $scope.url = default_options.url;
                 $scope.json = angular.toJson(default_options.json, true);
                 $scope.includeDefaults = default_options.includeDefaults;

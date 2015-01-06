@@ -17,14 +17,10 @@ angular.module('jsonschemaV4App')
             this.editableSchema = {};
             // Final JSON schema for use in Code View.
             this.schema = {};
-            //
-            this.exception = null;
 
             this.JSON2Schema = function() {
                 this.step0();
-                this.step1();
-                this.step2();
-                this.step3();
+                this.createFinalSchema();
             };
 
             this.isValidJSON = function(json) {
@@ -37,44 +33,30 @@ angular.module('jsonschemaV4App')
                 return true;
             };
 
-            /**
-             *
-             */
-            this.step0 = function() {
-                try {
-                    self.json = angular.fromJson(user_defined_options.json);
-                } catch(e) {
-                    self.exception = e;
-                }
-            };
-
-            /**
+             /**
              * Sets up the nested structure of the schema. Any schema
              * properties that can be set, are. It uses the Schema class as a
              * model and is NOT a collection of raw JavaScript { } objects,
              * i.e. it's not actually a JSON schema.
+             * Converts our custom Schema instances to real JavaScript objects.
+             * __metadata__ keys are added at this point.
              */
-            this.step1 = function() {
-                if (self.exception) return;
-                self.intermediateResult = self.schema4Object(undefined,
+            this.step0 = function() {
+                try {
+                    self.json = angular.fromJson(user_defined_options.json);
+                    self.intermediateResult = self.schema4Object(undefined,
                     self.json);
-            };
+                    self.editableSchema = self.constructSchema(self.intermediateResult);
+                } catch(e) {
 
-            /**
-            * Converts our custom Schema instances to real JavaScript objects.
-            * __metadata__ keys are added at this point.
-            */
-            this.step2 = function() {
-                if (self.exception) return;
-                self.editableSchema = self.constructSchema(self.intermediateResult);
+                }
             };
 
             /**
             * Copies JavaScript object for the editable view and starts the
             * process of producing a valid JSON Schema.
             */
-            this.step3 = function() {
-                if (self.exception) return;
+            this.createFinalSchema = function() {
                 self.schema = angular.copy(self.editableSchema);
                 this.clean(self.schema, null);
             };
@@ -464,7 +446,7 @@ angular.module('jsonschemaV4App')
             };
 
             this.getSchemaAsString = function(pretty_print) {
-                this.step3();
+                this.createFinalSchema();
                 var str = angular.toJson(self.schema, pretty_print);
                 str = str.replace('_$','$');
                 return str;
