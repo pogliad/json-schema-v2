@@ -220,7 +220,7 @@ angular.module('jsonschemaV4App')
                 switch(src.type) {
                     case 'array':
                         if (user_defined_options.arraysVerbose) {
-                            dst.minItems = 0;
+                            dst.minItems = 1;
                             dst.uniqueItems = false;
                         }
                         break;
@@ -234,14 +234,14 @@ angular.module('jsonschemaV4App')
                         if (user_defined_options.numericVerbose) {
                             dst.multipleOf = 1;
                             dst.maximum = 100;
-                            dst.minimum = 0;
+                            dst.minimum = 1;
                             dst.exclusiveMaximum = false;
                             dst.exclusiveMinimum = false;
                         }
                         break;
                     case 'string':
                         if (user_defined_options.stringsVerbose) {
-                            dst.minLength = 0;
+                            dst.minLength = 1;
                         }
                     case 'boolean':
                     case 'null':
