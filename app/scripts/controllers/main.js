@@ -100,14 +100,13 @@ angular.module('jsonschemaV4App')
                 user_defined_options.arraysVerbose = $scope.arraysVerbose;
                 user_defined_options.metadataKeywords = $scope.metadataKeywords;
                 user_defined_options.numericVerbose = $scope.numericVerbose;
+                user_defined_options.additionalItems = $scope.additionalItems;
+
 
 
                 // Generate basic schema structure.
                 Schemaservice.JSON2Schema();
 
-                if (Schemaservice.exception) {
-
-                }
                 $scope.json = Schemaservice.getFormattedJSON();
                 $rootScope.$broadcast('E_SchemaUpdated');
             };
@@ -117,6 +116,7 @@ angular.module('jsonschemaV4App')
                 user_defined_options = angular.copy(default_options);
 
                 $scope.inputError = false;
+                //
                 $scope.url = default_options.url;
                 $scope.json = angular.toJson(default_options.json, true);
                 $scope.includeDefaults = default_options.includeDefaults;
@@ -131,6 +131,7 @@ angular.module('jsonschemaV4App')
                 $scope.arraysVerbose = default_options.arraysVerbose;
                 $scope.metadataKeywords = default_options.metadataKeywords;
                 $scope.numericVerbose = default_options.numericVerbose;
+                $scope.additionalItems = default_options.additionalItems;
             }
 
             $scope.init = function() {

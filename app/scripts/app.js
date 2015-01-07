@@ -2,37 +2,37 @@
 
 var testData = {
     basic: {
-        "address": {
-            "streetAddress": "21 2nd Street",
-            "city": "New York"
-        },
-        "phoneNumber": [{
-            "location": "home",
-            "code": 44
-        }]
+        'address': {
+            'streetAddress': '21 2nd Street',
+            'city': 'New York'
+          },
+            'phoneNumber': [{
+                'location': 'home',
+                'code': 44
+            }]
     },
 
-    array: [1, 0.2, "three"],
+    array: [1, 0.2, 'three'],
 
     empty: {},
 
     glossary: {
-        "glossary": {
-            "title": "example glossary",
-            "GlossDiv": {
-                "title": "S",
-                "GlossList": {
-                    "GlossEntry": {
-                        "ID": "SGML",
-                        "SortAs": "SGML",
-                        "GlossTerm": "Standard Generalized Markup Language",
-                        "Acronym": "SGML",
-                        "Abbrev": "ISO 8879:1986",
-                        "GlossDef": {
-                            "para": "A meta-markup language, used to create markup languages such as DocBook.",
-                            "GlossSeeAlso": ["GML", "XML"]
+        'glossary': {
+            'title': 'example glossary',
+            'GlossDiv': {
+                'title': 'S',
+                'GlossList': {
+                    'GlossEntry': {
+                        'ID': 'SGML',
+                        'SortAs': 'SGML',
+                        'GlossTerm': 'Standard Generalized Markup Language',
+                        'Acronym': 'SGML',
+                        'Abbrev': 'ISO 8879:1986',
+                        'GlossDef': {
+                            'para': 'A meta-markup language, used to create markup languages such as DocBook.',
+                            'GlossSeeAlso': ['GML', 'XML']
                         },
-                        "GlossSee": "markup"
+                        'GlossSee': 'markup'
                     }
                 }
             }
@@ -40,22 +40,22 @@ var testData = {
     },
 
     menu: {
-      "menu": {
-        "id": "file",
-        "value": "File",
-        "popup": {
-          "menuitem": [
+      'menu': {
+        'id': 'file',
+        'value': 'File',
+        'popup': {
+          'menuitem': [
             {
-              "value": "New",
-              "onclick": "CreateNewDoc()"
+              'value': 'New',
+              'onclick': 'CreateNewDoc()'
             },
             {
-              "value": "Open",
-              "onclick": "OpenDoc()"
+              'value': 'Open',
+              'onclick': 'OpenDoc()'
             },
             {
-              "value": "Close",
-              "onclick": "CloseDoc()"
+              'value': 'Close',
+              'onclick': 'CloseDoc()'
             }
           ]
         }
@@ -63,30 +63,30 @@ var testData = {
     },
 
     widget: {
-      "widget": {
-        "debug": "on",
-        "window": {
-          "title": "Sample Konfabulator Widget",
-          "name": "main_window",
-          "width": 500,
-          "height": 500
+      'widget': {
+        'debug': 'on',
+        'window': {
+          'title': 'Sample Konfabulator Widget',
+          'name': 'main_window',
+          'width': 500,
+          'height': 500
         },
-        "image": {
-          "src": "Images/Sun.png",
-          "name": "sun1",
-          "hOffset": 250,
-          "vOffset": 250,
-          "alignment": "center"
+        'image': {
+          'src': 'Images/Sun.png',
+          'name': 'sun1',
+          'hOffset': 250,
+          'vOffset': 250,
+          'alignment': 'center'
         },
-        "text": {
-          "data": "Click Here",
-          "size": 36,
-          "style": "bold",
-          "name": "text1",
-          "hOffset": 250,
-          "vOffset": 100,
-          "alignment": "center",
-          "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+        'text': {
+          'data': 'Click Here',
+          'size': 36,
+          'style': 'bold',
+          'name': 'text1',
+          'hOffset': 250,
+          'vOffset': 100,
+          'alignment': 'center',
+          'onMouseUp': 'sun1.opacity = (sun1.opacity / 100) * 90;'
         }
       }
     }
@@ -97,22 +97,23 @@ var app = angular.module('jsonschemaV4App', [
     'ngCookies',
     'ngResource',
     'ngSanitize',
-    'ngRoute'
+    'ngRoute',
+    'ui'
 ]);
 
 var arrayOptionsEnum = {
-    singleSchema: "singleSchema",
-    arraySchema: "schemaArray",
-    emptySchema: "emptySchema",
-    anyOf: "anyOf",
-    oneOf: "oneOf",
-    allOf: "allOf"
+    singleSchema: 'singleSchema',
+    arraySchema: 'schemaArray',
+    emptySchema: 'emptySchema',
+    anyOf: 'anyOf',
+    oneOf: 'oneOf',
+    allOf: 'allOf'
 };
 
 // User cannot change these values.
 app.constant('Version', 0.1);
 app.constant('ArrayOptions', arrayOptionsEnum);
-app.constant('Specification', "http://json-schema.org/draft-04/schema#");
+app.constant('Specification', 'http://json-schema.org/draft-04/schema#');
 
 // Assume some default values for user defined parameters.
 var default_options = {
@@ -130,6 +131,7 @@ var default_options = {
     objectsVerbose: false,
     arraysVerbose: false,
     metadataKeywords: false,
+    additionalItems: true
 }
 
 // User starts with default options.

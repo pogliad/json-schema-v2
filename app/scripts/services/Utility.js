@@ -28,5 +28,21 @@ angular.module('jsonschemaV4App')
                 type = 'boolean';
             }
             return type;
+        };
+
+        this.getEmptySchema = function() {
+            var schmea = {};
+            var key = 'auto-generated-schema-' + Math.floor((Math.random() * 1000) + 1);
+
+            schmea.__key__ = key;
+            schmea.id = key;
+
+            if (user_defined_options.metadataKeywords) {
+                schmea.title = String(key)[0].toUpperCase() + String(key).slice(1) + ' schema.';
+                schmea.description = 'An explanation about the puropose of this instance described by this schema.';
+                schmea.name = String(key);
+            }
+
+            return schmea;
         }
     });

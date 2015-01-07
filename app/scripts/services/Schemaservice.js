@@ -100,7 +100,7 @@ angular.module('jsonschemaV4App')
                                         if (!parent.required) {
                                             parent.required = [];
                                         }
-                                    parent.required.push(key);
+                                        parent.required.push(key);
                                 } else {
                                     if (parent.required) {
                                         var index = parent.required.indexOf(key);
@@ -129,6 +129,14 @@ angular.module('jsonschemaV4App')
                                 }
                                 break;
                             case 'additionalItems':
+                                var val = Boolean(obj[k]);
+                                obj[k] = val;
+                                if (!user_defined_options.arraysVerbose) {
+                                    if (val) {
+                                        // true is default
+                                        delete obj[k];
+                                    }
+                                }
                                 break;
                             /*
                             Keywords for numeric instances (number and
@@ -222,6 +230,8 @@ angular.module('jsonschemaV4App')
                         if (user_defined_options.arraysVerbose) {
                             dst.minItems = 1;
                             dst.uniqueItems = false;
+                            dst.additionalItems = user_defined_options.additionalItems;
+                            console.log(user_defined_options.additionalItems);
                         }
                         break;
                     case 'object':
@@ -271,14 +281,7 @@ angular.module('jsonschemaV4App')
                         case ArrayOptions.singleSchema:
                             dst.items = {};
                             break;
-                        case ArrayOptions.anyOf:
-                            dst.items = {};
-                            dst.items.anyOf = [];
-                            break;
-                        case ArrayOptions.oneOf:
-                            dst.items = {};
-                            dst.items.oneOf = [];
-                            break;
+
                         case ArrayOptions.arraySchema:
                             dst.items = [];
                             break;
@@ -324,11 +327,16 @@ angular.module('jsonschemaV4App')
             };
 
             this.addRequired = function(src, dst) {
+                dst.__required__=user_defined_options.forceRequired;
+            };
 
-                // TODO: Check this?
-                // Don't allow array indexes to be 'required'
-                if (!src.type=='array') {
-                    dst.__required__=user_defined_options.forceRequired;
+            this.setAdditionalItems = function(src, dst) {
+                if (src.isArray()) {
+                    if (!user_defined_options.additionalItems) {
+                        dst.additionalItems=false;
+                    } else {
+                        dst.additionalItems=true;
+                    }
                 }
             };
 
@@ -351,6 +359,7 @@ angular.module('jsonschemaV4App')
                 self.addDefault(intermediate_schema, schema);
                 self.addEnums(intermediate_schema, schema);
                 self.addRequired(intermediate_schema, schema);
+                self.setAdditionalItems(intermediate_schema, schema);
 
                 // Subschemas last.
                 // Don't actually add any properties or items, just initialize
@@ -379,16 +388,10 @@ angular.module('jsonschemaV4App')
                         switch(user_defined_options.arrayOptions) {
 
                             case ArrayOptions.emptySchema:
-                                schema.items = {};
+                                schema.items = Utility.getEmptySchema();
                                 break;
                             case ArrayOptions.singleSchema:
                                 schema.items = subSchema;
-                                break;
-                            case ArrayOptions.anyOf:
-                                schema.items.anyOf.push(subSchema);
-                                break;
-                            case ArrayOptions.oneOf:
-                                schema.items.oneOf.push(subSchema);
                                 break;
                             case ArrayOptions.arraySchema:
                                 //  Use array of schemas, however, still may only be one.
@@ -403,6 +406,7 @@ angular.module('jsonschemaV4App')
                         }
                     }
                 });
+
                 return schema;
             };
 
