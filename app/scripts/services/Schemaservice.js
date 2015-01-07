@@ -331,6 +331,9 @@ angular.module('jsonschemaV4App')
             };
 
             this.setAdditionalItems = function(src, dst) {
+                // TODO
+                // confused with step() post processing
+                //
                 if (src.isArray()) {
                     if (!user_defined_options.additionalItems) {
                         dst.additionalItems=false;
