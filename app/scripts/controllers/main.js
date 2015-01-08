@@ -101,6 +101,7 @@ angular.module('jsonschemaV4App')
                 user_defined_options.metadataKeywords = $scope.metadataKeywords;
                 user_defined_options.numericVerbose = $scope.numericVerbose;
                 user_defined_options.additionalItems = $scope.additionalItems;
+                user_defined_options.additionalProperties = $scope.additionalProperties;
 
 
 
@@ -132,6 +133,7 @@ angular.module('jsonschemaV4App')
                 $scope.metadataKeywords = default_options.metadataKeywords;
                 $scope.numericVerbose = default_options.numericVerbose;
                 $scope.additionalItems = default_options.additionalItems;
+                $scope.additionalProperties = default_options.additionalProperties;
             }
 
             $scope.init = function() {

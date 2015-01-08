@@ -62,6 +62,8 @@ angular.module('jsonschemaV4App')
             };
 
             /**
+            * This gets run every time the code view is selected!
+            * ---------------------------------------------------
             * Takes any action on __metadata__ keys.
             * Tidy any properties, for example checking types.
             * Finally removes any __metadata__ properites.
@@ -185,7 +187,8 @@ angular.module('jsonschemaV4App')
                                 var val = Boolean(obj[k]);
                                 obj[k] = val;
                                 if (!user_defined_options.objectsVerbose) {
-                                    if (!val) {
+                                    if (val) {
+                                        // true is default
                                         delete obj[k];
                                     }
                                 }
@@ -231,7 +234,6 @@ angular.module('jsonschemaV4App')
                             dst.minItems = 1;
                             dst.uniqueItems = false;
                             dst.additionalItems = user_defined_options.additionalItems;
-                            console.log(user_defined_options.additionalItems);
                         }
                         break;
                     case 'object':
@@ -258,6 +260,7 @@ angular.module('jsonschemaV4App')
                         break;
                 }
 
+                // Metadata keywords apply to all types.
                 if (user_defined_options.metadataKeywords) {
                     dst.title = src.title;
                     dst.description = src.description;
@@ -265,13 +268,23 @@ angular.module('jsonschemaV4App')
                 }
             };
 
-            this.initProperties = function(src, dst) {
+            this.initObject = function(src, dst) {
                 if (src.isObject()) {
                     dst.properties = {};
+
+                    if (!user_defined_options.additionalProperties) {
+                        // false is not default, so always show.
+                        dst.additionalProperties = false;
+                    } else {
+                        // true is default, only show if objects are verbose.
+                        if (user_defined_options.objectsVerbose) {
+                            dst.additionalProperties = true;
+                        }
+                    }
                 }
             };
 
-            this.initItems = function(src, dst) {
+            this.initArray = function(src, dst) {
                 if (src.isArray()) {
                     switch(user_defined_options.arrayOptions) {
 
@@ -286,22 +299,17 @@ angular.module('jsonschemaV4App')
                             dst.items = [];
                             break;
                     }
+
+                    if (!user_defined_options.additionalItems) {
+                        // false is not default, so always show.
+                        dst.additionalItems = false;
+                    } else {
+                        // true is default, only show if objects are verbose.
+                        if (user_defined_options.arraysVerbose) {
+                            dst.additionalItems = true;
+                        }
+                    }
                 }
-            };
-
-            this.constructId = function(src, dst) {
-                if (src.root || !user_defined_options.absoluteIds) {
-
-                    dst.id = src.id;
-                } else if (user_defined_options.absoluteIds) {
-                    dst.id = (src.parent.id + "/" + src.id);
-
-                    // We MUST set the parent ID to the ABSOLUTE URL
-                    // so when the child builds upon it, it too is an
-                    // absolute URL.
-                    src.id = dst.id;
-                }
-                dst.__key__ = src.key;
             };
 
             this.addDefault = function(src, dst) {
@@ -322,53 +330,78 @@ angular.module('jsonschemaV4App')
                 }
             };
 
-            this.setType = function(src, dst) {
-            	dst.type = src.type;
-            };
-
             this.addRequired = function(src, dst) {
-                dst.__required__=user_defined_options.forceRequired;
+                dst.__required__ = user_defined_options.forceRequired;
             };
 
-            this.setAdditionalItems = function(src, dst) {
-                // TODO
-                // confused with step() post processing
-                //
-                if (src.isArray()) {
-                    if (!user_defined_options.additionalItems) {
-                        dst.additionalItems=false;
+            this.setType = function(src, dst) {
+                dst.type = src.type;
+            };
+
+            this.constructId = function(src, dst) {
+
+                if (user_defined_options.absoluteIds) {
+                    if (src.root) {
+                        dst.id = user_defined_options.url;
                     } else {
-                        dst.additionalItems=true;
+                        /*
+                        First time round, this will the child of root and will
+                        be: (http://jsonschema.net + '/' + address)
+                        */
+                        var asboluteId = (src.parent.id + '/' + src.id);
+                        dst.id = asboluteId;
+
+                        // We MUST set the parent ID to the ABSOLUTE URL
+                        // so when the child builds upon it, it too is an
+                        // absolute URL.
+                        /*
+                        The current object will be a parent later on. By setting
+                        src.id now, any children of this object will call
+                        src.parent.id when constructing the absolute ID.
+                        */
+                        src.id = asboluteId;
+                    }
+                } else {
+                    // Relative IDs
+                    if (src.root) {
+                        dst.id = '/';
+                    } else {
+                        dst.id = src.id;
                     }
                 }
+
+                dst.__key__ = src.key;
             };
 
-            this.completeArrayOptions = function(src, dst) {
-
+            this.setSchemaRef = function(src, dst) {
+                if (src.root) {
+                    // Explicitly declare this JSON as JSON schema.
+                    dst._$schema = Specification;
+                    dst.__root__ = true;
+                }
             }
 
             this.constructSchema = function(intermediate_schema) {
                 var schema = {};
 
-                if (intermediate_schema.root) {
-                    // Explicitly declare this JSON as JSON schema.
-                    schema._$schema = Specification;
-                    schema.__root__ = true;
-                }
-
+                /*
+                Set as many values as possible now.
+                */
+                self.setSchemaRef(intermediate_schema, schema);
                 self.constructId(intermediate_schema, schema);
                 self.setType(intermediate_schema, schema);
                 self.makeVerbose(intermediate_schema, schema);
                 self.addDefault(intermediate_schema, schema);
                 self.addEnums(intermediate_schema, schema);
                 self.addRequired(intermediate_schema, schema);
-                self.setAdditionalItems(intermediate_schema, schema);
 
-                // Subschemas last.
-                // Don't actually add any properties or items, just initialize
-                // the object properties so properties and items may be added.
-                self.initProperties(intermediate_schema, schema);
-                self.initItems(intermediate_schema, schema);
+                /*
+                Subschemas last.
+                Don't actually add any properties or items, just initialize
+                the object properties so properties and items may be added.
+                */
+                self.initObject(intermediate_schema, schema);
+                self.initArray(intermediate_schema, schema);
 
                 // Schemas with no sub-schemas will just skip this loop and
                 // return the { } object.
@@ -377,10 +410,6 @@ angular.module('jsonschemaV4App')
                     // Each sub-schema will need its own {} schema object.
                     var subSchema = self.constructSchema(value);
                     subSchema.__parent__ = schema.id;
-
-                    // Because the outer loop iterates over sub-schemas
-                    // we make each a required property in it's parent.
-                    //self.addRequired(intermediate_schema, schema, value, subSchema);
 
                     if (intermediate_schema.isObject()) {
                         schema.properties[value.key] = subSchema;

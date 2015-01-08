@@ -47,12 +47,23 @@
           <label class="control-label">Required</label>
       </div>
 
+    <!-- Start Type Specific Rows -->
+    <span ng-if="data.type=='object'">
       <div class="col-xs-2">
           <div class="checkbox">
             <input type="checkbox" ng-model="data.additionalProperties" />
           </div>
           <label class="control-label">Add'l Properties</label>
       </div>
+    </span>
+    <span ng-if="data.type=='array'">
+      <div class="col-xs-2">
+          <div class="checkbox">
+            <input type="checkbox" ng-model="data.additionalItems" />
+          </div>
+          <label class="control-label">Add'l Items</label>
+      </div>
+    </span>
 
     </div>
 

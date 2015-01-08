@@ -131,7 +131,8 @@ var default_options = {
     objectsVerbose: false,
     arraysVerbose: false,
     metadataKeywords: false,
-    additionalItems: true
+    additionalItems: true,
+    additionalProperties: true
 }
 
 // User starts with default options.

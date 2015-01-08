@@ -48,8 +48,60 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">General</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="includeDefaults">Include default values
+                                    <span id="helpBlock" class="help-block">
+                                    Values are taken from JSON.</span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="includeEnums">Restrict values to enum
+                                    <span id="helpBlock" class="help-block">
+                                    Uses the default value and null.</span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="absoluteIds">Use absolute IDs
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="forceRequired">Force required
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Objects</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="additionalProperties">Allow additional properties
+                                    <span id="helpBlock" class="help-block">
+                                    Controls whether it’s valid to have additional properties in the object beyond what is defined in the schema.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">Arrays</label>
                         <div class="col-sm-10">
+
+                        <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="additionalItems">Allow additional items
+                                    <span id="helpBlock" class="help-block">
+                                    Controls whether it’s valid to have additional items in the array beyond what is defined in the schema.</span>
+                                </label>
+                            </div>
 
                             <div class="radio">
                                 <label>
@@ -69,13 +121,6 @@
                                 </label>
                             </div>
 
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" ng-model="additionalItems">Allow additional items
-                                    <span id="helpBlock" class="help-block">
-                                    Controls whether it’s valid to have additional items in the array beyond what is defined in the schema.</span>
-                                </label>
-                            </div>
                             <!--div class="radio">
                                 <label>
                                     <input type="radio" ng-model="arrayOptions" name="arrayOptions" id="oneOf" value="oneOf">One of
@@ -93,31 +138,7 @@
                             </div-->
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">General</label>
-                        <div class="col-sm-10">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" ng-model="includeDefaults">Include default values
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" ng-model="includeEnums">Restrict values to enum (includes null).
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" ng-model="absoluteIds">Use absolute IDs
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" ng-model="forceRequired">Force required
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Verboseness</label>
                         <div class="col-sm-10">
