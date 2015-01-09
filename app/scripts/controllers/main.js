@@ -103,8 +103,6 @@ angular.module('jsonschemaV4App')
                 user_defined_options.additionalItems = $scope.additionalItems;
                 user_defined_options.additionalProperties = $scope.additionalProperties;
 
-
-
                 // Generate basic schema structure.
                 Schemaservice.JSON2Schema();
 

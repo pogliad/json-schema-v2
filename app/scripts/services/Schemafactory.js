@@ -4,6 +4,12 @@ angular.module('jsonschemaV4App')
     .factory('Schemafactory', ['$log', 'Utility',
         function($log, Utility) {
 
+            /**
+            * Note that this function does not check user_defined_options.
+            * It just sets all data that we know of now, or can deduce.
+            * For example, we set name, title and description whether or not
+            * user_defined_options.metadataKeywords is true.
+            */
             var Schema = function(aKey, aValue) {
 
                 var isPrimitiveType = (
@@ -19,7 +25,7 @@ angular.module('jsonschemaV4App')
                 this.title = this.root ? 'Root schema.' : String(aKey)[0].toUpperCase() + String(aKey).slice(1) + ' schema.';
                 this.description = 'An explanation about the puropose of this instance described by this schema.';
                 this.name = this.root ? '/' : String(aKey);
-                if (user_defined_options.includeDefaults && isPrimitiveType) {
+                if (isPrimitiveType) {
                     this.defaultValue = aValue;
                 }
 

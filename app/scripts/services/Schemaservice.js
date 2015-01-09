@@ -18,9 +18,12 @@ angular.module('jsonschemaV4App')
             // Final JSON schema for use in Code View.
             this.schema = {};
 
+            /**
+            * Called from the Controller. Generates the schema.
+            */
             this.JSON2Schema = function() {
-                this.step0();
-                this.createFinalSchema();
+                this.jsonString2EditableSchema();
+                this.editableSchema2FinalSchema();
             };
 
             this.isValidJSON = function(json) {
@@ -41,12 +44,21 @@ angular.module('jsonschemaV4App')
              * Converts our custom Schema instances to real JavaScript objects.
              * __metadata__ keys are added at this point.
              */
-            this.step0 = function() {
+            this.jsonString2EditableSchema = function() {
                 try {
+                    // Convert JSON string to JavaScript object.
                     self.json = angular.fromJson(user_defined_options.json);
+                    /*
+                    * Construct our own, custom, intermediate format that
+                    * represents the hierarchy of parent / child schemas but
+                    * not much else.
+                    */
                     self.intermediateResult = self.schema4Object(undefined,
                     self.json);
-                    self.editableSchema = self.constructSchema(self.intermediateResult);
+                    /* Create real JavaScript obect, but not valid Schema since
+                    objects contains all sorts of custom properties.*/
+                    self.editableSchema = self.constructSchema(
+                        self.intermediateResult);
                 } catch(e) {
 
                 }
@@ -56,7 +68,7 @@ angular.module('jsonschemaV4App')
             * Copies JavaScript object for the editable view and starts the
             * process of producing a valid JSON Schema.
             */
-            this.createFinalSchema = function() {
+            this.editableSchema2FinalSchema = function() {
                 self.schema = angular.copy(self.editableSchema);
                 this.clean(self.schema, null);
             };
@@ -325,7 +337,11 @@ angular.module('jsonschemaV4App')
                 if (user_defined_options.includeEnums) {
                    if (!src.isObject() && !src.isArray()) {
                         // Only primitive types have enums.
-                        dst.enum = [src.defaultValue, null];
+                        dst.enum = [null];
+
+                        if (src.defaultValue) {
+                            dst.enum.push(src.defaultValue);
+                        }
                     }
                 }
             };
@@ -482,7 +498,7 @@ angular.module('jsonschemaV4App')
             };
 
             this.getSchemaAsString = function(pretty_print) {
-                this.createFinalSchema();
+                this.editableSchema2FinalSchema();
                 var str = angular.toJson(self.schema, pretty_print);
                 str = str.replace('_$','$');
                 return str;
