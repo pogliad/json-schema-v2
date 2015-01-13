@@ -70,7 +70,7 @@ angular.module('jsonschemaV4App')
             */
             this.editableSchema2FinalSchema = function() {
                 self.schema = angular.copy(self.editableSchema);
-                this.clean(self.schema, null);
+                this.clean(self.schema);
             };
 
             /**
@@ -85,7 +85,7 @@ angular.module('jsonschemaV4App')
             * @param {object} parent Parent JavaScript object used for setting
                 up the 'required' property from __required__ metadata.
             */
-            this.clean = function(obj, parent) {
+            this.clean = function(obj) {
                 var key = obj['__key__'];
 
                 for (var k in obj)
@@ -96,34 +96,38 @@ angular.module('jsonschemaV4App')
                             continue;
                         }
                         // Recursive call parsing in parent object this time.
-                        this.clean(obj[k], obj);
+                        //console.log(obj[k]);
+                        this.clean(obj[k]);
                     }
                     else {
-
-
                         switch (String(k)) {
                             /*
                             Metadata keywords.
                             */
                             case '__required__':
 
-                                if (parent) {
-                                    var required = obj[k];
+                                var required = obj[k];
+                              /*  console.log(obj[k].__key__);
+                                console.log(required);
+                                console.log(obj.__parent__);*/
+                                var s = self.getSchema(obj.__parent__);
 
-                                    if (required) {
-                                        if (!parent.required) {
-                                            parent.required = [];
-                                        }
-                                        parent.required.push(key);
+                                if (!s) {
+                                    break;
+                                }
+                                if (required) {
+                                    if (!s.required) {
+                                         s.required = [];
+                                    }
+                                    s.required.push(key);
                                 } else {
-                                    if (parent.required) {
-                                        var index = parent.required.indexOf(key);
+                                    if (s.required) {
+                                        var index = s.required.indexOf(key);
                                         if (index > -1) {
-                                            parent.required.splice(index, 1);
+                                            s.required.splice(index, 1);
                                         }
                                     }
-                                }
-                            }
+                                }   
                             break;
                             case '__removed__':
                                 break;
@@ -473,14 +477,31 @@ angular.module('jsonschemaV4App')
                             }
                     }
                 }
-            }
+            };
+
+            this.getSchemaById = function(obj, id) {
+
+                for (var k in obj)
+                {
+                    if (typeof obj[k] == "object" && obj[k] !== null) {
+                        this.getSchemaById(obj[k], id);
+                    }
+
+                    switch (String(k)) {
+                        case 'id':
+                            if (obj[k] == id) {
+                                return obj;
+                            }
+                    }
+                }
+            };
 
             this.removeSchema = function(id) {
                 this.removeSchemaById(self.editableSchema, id);
             };
 
-            this.getSchema = function() {
-                return self.schema;
+            this.getSchema = function(id) {
+                return this.getSchemaById(self.editableSchema, id);
             };
 
             this.getEditableSchema = function() {
